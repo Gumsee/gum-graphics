@@ -38,7 +38,7 @@ public:
     static void unbind(const ivec2& viewportsize = ivec2(0,0));
     void resetViewport();
 
-    Texture2D* addTextureAttachment(unsigned int index = 0, std::string name = "framebufferTexture", int datatype = Texture::Datatypes::UNSIGNED_CHAR);
+    Texture2D* addTextureAttachment(unsigned int index = 0, std::string name = "framebufferTexture", uint16_t datatype = Texture::Datatypes::UNSIGNED_CHAR, uint16_t numChannels = 4);
     TextureCube* addCubeTextureAttachment(unsigned int index = 0, std::string name = "framebufferCubeTexture", uint16_t format = Texture::Pixelformat::RGBA, uint16_t internalFormat = Texture::Pixelformat::RGBA, int datatype = Texture::Datatypes::UNSIGNED_CHAR);
     TextureDepth* addDepthTextureAttachment(std::string name = "framebufferDepthTexture");
     TextureDepth* addDepthStencilTextureAttachment(std::string name = "framebufferDepthStencilTexture");

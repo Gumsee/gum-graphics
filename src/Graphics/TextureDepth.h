@@ -1,5 +1,5 @@
 #pragma once
-#include "Texture2D.h"
+#include "Texture.h"
 
 class TextureDepth : public Texture
 {

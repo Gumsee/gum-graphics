@@ -41,6 +41,8 @@ public:
 		static const uint16_t BGR;
 		static const uint16_t RG;
 		static const uint16_t R;
+		static const uint16_t RGBA16F;
+		static const uint16_t RGBA32F;
 	};
 
 private:

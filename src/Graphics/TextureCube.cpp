@@ -1,9 +1,7 @@
 #include "TextureCube.h"
-#include <GL/glew.h>
 #include <System/Output.h>
 #include <System/MemoryManagement.h>
 #include <future>
-#include "WrapperFunctions.h"
 #include <Codecs/TextureLoader.h>
 
 TextureCube::TextureCube(std::string name, uint16_t datatype)
@@ -45,7 +43,7 @@ void TextureCube::load(std::vector<std::string> texturepaths, bool wait)
 		return;
 	}
 
-    auto future = std::async(std::launch::async, [texturepaths, wait, this] {
+    auto future = std::async(std::launch::async, [texturepaths, this] {
 		for(size_t i = 0; i < texturepaths.size(); i++)
 		{
 			ImageData imageData = TextureLoader::loadImage(texturepaths[i]);
