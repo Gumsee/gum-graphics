@@ -1,5 +1,4 @@
 #include "Texture3D.h"
-#include <GL/glew.h>
 #include <cstdint>
 #include <iostream>
 #include <future>

@@ -11,16 +11,16 @@ class VertexArrayObject
 public:
     struct PrimitiveTypes
     {
-        static unsigned int POINTS;
-        static unsigned int TRIANGLES;
-        static unsigned int TRIANGLE_STRIP;
-        static unsigned int TRIANGLE_FAN;
-        static unsigned int LINES;
-        static unsigned int LINE_STRIP;
-        static unsigned int LINE_LOOP;
-        static unsigned int LINE_ADJACENCY;
-        static unsigned int QUADS;
-        static unsigned int QUAD_STRIP;
+        static const unsigned int POINTS;
+        static const unsigned int TRIANGLES;
+        static const unsigned int TRIANGLE_STRIP;
+        static const unsigned int TRIANGLE_FAN;
+        static const unsigned int LINES;
+        static const unsigned int LINE_STRIP;
+        static const unsigned int LINE_LOOP;
+        static const unsigned int LINE_ADJACENCY;
+        static const unsigned int QUADS;
+        static const unsigned int QUAD_STRIP;
     };
 
 private:
@@ -36,15 +36,23 @@ private:
     void updateRenderCount();
     void createNative();
     void destroyNative();
+    void addAttributeNative(const unsigned int& index, const unsigned int& dimension, const unsigned int& type, const size_t& stride, const size_t& offset, const unsigned int& divisor);
+    void addAttributeMat4Native(unsigned int index, unsigned int type, const unsigned int& divisor);
+    void addAttributeMat3Native(unsigned int index, unsigned int type, const unsigned int& divisor);
 
 public:
-    VertexArrayObject(const unsigned int& primitivetype = PrimitiveTypes::TRIANGLES);
+    VertexArrayObject(const unsigned int& primitivetype);
     ~VertexArrayObject();
 
     void bind();
     void unbind();
 
-    unsigned int addElementBuffer(ElementBufferObject* elembuffer, unsigned int usage = GL_STATIC_DRAW);
+    void render(const unsigned int& instances);
+    void renderIndexed(const unsigned int& instances);
+    void renderTesselated(const unsigned int& instances);
+    void renderTesselatedIndexed(const unsigned int& instances);
+
+    unsigned int addElementBuffer(ElementBufferObject* elembuffer);
 
     template<typename T>
     unsigned int addAttribute(VertexBufferObject<T>* vbo, const unsigned int& index, const unsigned int& dimension, 
@@ -53,19 +61,9 @@ public:
         bind();
         vbo->bind();
         if(std::find(vAttributes.begin(), vAttributes.end(), index) != vAttributes.end())
-        {
             Gum::Output::warn("VertexArrayObject: Attribute " + std::to_string(index) + " has already been added! (Not doing anything..)");
-        }
         else
-        {
-            glEnableVertexAttribArray(index);
-            if(type == GL_BYTE || type ==  GL_UNSIGNED_BYTE || type == GL_SHORT || type == GL_UNSIGNED_SHORT || type == GL_INT || type == GL_UNSIGNED_INT)
-                glVertexAttribIPointer(index, dimension, type, stride, (void*)offset);
-            else
-                glVertexAttribPointer(index, dimension, type, GL_FALSE, stride, (void*)offset);
-            glVertexAttribDivisor(index, divisor);
-            vAttributes.push_back(index);
-        }
+            addAttributeNative(index, dimension, type, stride, offset, divisor);
         vbo->unbind();
         unbind();
         return index;
@@ -75,11 +73,11 @@ public:
     template<typename T>
     unsigned int addAttributeMat4(VertexBufferObject<T>* vbo, unsigned int index, unsigned int type, const unsigned int& divisor)
     {
-        size_t vec4Size = sizeof(vec4);
-        addAttribute(vbo, index + 0, 4, type, 4 * vec4Size, 0 * vec4Size, divisor);
-        addAttribute(vbo, index + 1, 4, type, 4 * vec4Size, 1 * vec4Size, divisor);
-        addAttribute(vbo, index + 2, 4, type, 4 * vec4Size, 2 * vec4Size, divisor);
-        addAttribute(vbo, index + 3, 4, type, 4 * vec4Size, 3 * vec4Size, divisor);
+        bind();
+        vbo->bind();
+        addAttributeMat4Native(index, type, divisor);
+        vbo->unbind();
+        unbind();
         return index;
     }
 
@@ -87,10 +85,11 @@ public:
     template<typename T>
     unsigned int addAttributeMat3(VertexBufferObject<T>* vbo, unsigned int index, unsigned int type, const unsigned int& divisor)
     {
-        size_t vec3Size = sizeof(vec3);
-        addAttribute(vbo, index + 0, 3, type, 3 * vec3Size, 0 * vec3Size, divisor);
-        addAttribute(vbo, index + 1, 3, type, 3 * vec3Size, 1 * vec3Size, divisor);
-        addAttribute(vbo, index + 2, 3, type, 3 * vec3Size, 2 * vec3Size, divisor);
+        bind();
+        vbo->bind();
+        addAttributeMat3Native(index, type, divisor);
+        vbo->unbind();
+        unbind();
         return index;
     }
 

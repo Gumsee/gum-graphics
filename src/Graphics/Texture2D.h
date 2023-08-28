@@ -1,5 +1,6 @@
 #pragma once
 #include "Texture.h"
+#include "Variables.h"
 
 class Texture2D : public Texture
 {
@@ -11,7 +12,7 @@ protected:
 
 
 public:
-	Texture2D(std::string name = "unknown", uint16_t datatype = Datatypes::UNSIGNED_CHAR);
+	Texture2D(std::string name = "unknown", uint16_t datatype = Gum::Graphics::Datatypes::UNSIGNED_CHAR);
 	virtual ~Texture2D();
 
     void updateImage();
@@ -19,19 +20,19 @@ public:
 	void loadFromMemory(unsigned char* pixels, size_t size);
 	void bind(const int& index = 0);
 	void unbind(const int& index = 0);
+	static void unbindGlobal(const int& index = 0);
 
     float getHeightMapPixel(int x, int y);
     void initEmpty();
     
     void repeat(bool mirrored = false);
     void clampToEdge(bool border = false);
-    void createMipmaps();
     void setFiltering(FilteringTypes filteringtype);
 
 
     //Setter
     void setSize(const ivec2& size);
-    void setData(unsigned char* data);
+    void setData(void* data);
     void setPixel(const int& x, const int& y, const vec4& color);
     void setNumChannels(const int& channels);
 

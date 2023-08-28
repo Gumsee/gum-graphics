@@ -1,6 +1,22 @@
 #pragma once
+#include "Variables.h"
+#include <cstddef>
 #include <vector>
-#include <GL/glew.h>
+
+
+namespace Gum {
+namespace Graphics {
+namespace VertexBufferObject
+{
+    unsigned int createNative();
+    void destroyNative(const unsigned int& id);
+    void bind(const unsigned int& id);
+    void unbind();
+
+    void setDataNative(size_t datasize, const void* data, size_t length, const unsigned int& usage);
+    void setSingleDataNative(size_t datasize, const void* data, const unsigned int& offset);
+    void* getDataPointerNative(size_t datasize, const unsigned int& offset, const unsigned int& amount);
+}}};
 
 template<typename T>
 class VertexBufferObject
@@ -8,33 +24,33 @@ class VertexBufferObject
 private:
     unsigned int ivboID;
     unsigned int iLength;
+    size_t iSizeOfType;
 
 public:
-    VertexBufferObject()
+    VertexBufferObject() : iSizeOfType(sizeof(T))
     {
-        ivboID = 0;
-        glGenBuffers(1, &ivboID);
+        ivboID = Gum::Graphics::VertexBufferObject::createNative();
     }
 
     ~VertexBufferObject() 
     {
-        glDeleteBuffers(1, &ivboID);
+        Gum::Graphics::VertexBufferObject::destroyNative(ivboID);
     }
 
     void bind()
     {
-        glBindBuffer(GL_ARRAY_BUFFER, ivboID); 
+        Gum::Graphics::VertexBufferObject::bind(ivboID);
     }
-
+    
     void unbind()
     {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        Gum::Graphics::VertexBufferObject::unbind();
     }
 
-    void setData(const std::vector<T>& data, const unsigned int& usage = GL_STATIC_DRAW)
+    void setData(const std::vector<T>& data, const unsigned short& usage)
     {
         bind();
-        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(T), data.data(), usage);
+        Gum::Graphics::VertexBufferObject::setDataNative(iSizeOfType, data.data(), data.size(), usage);
         iLength = data.size();
         unbind();
     }
@@ -42,7 +58,7 @@ public:
     T* getDataPointer(const unsigned int& offset, const unsigned int& amount)
     {
         bind();
-        T* data = (T*)glMapBufferRange(GL_ARRAY_BUFFER, offset * sizeof(T), amount * sizeof(T), GL_MAP_WRITE_BIT);
+        T* data = (T*)Gum::Graphics::VertexBufferObject::getDataPointerNative(iSizeOfType, offset, amount);
         unbind();
         return data;
     }
@@ -50,7 +66,7 @@ public:
     void setSingleData(const T& data, const unsigned int& offset)
     {
         bind();
-        glBufferSubData(GL_ARRAY_BUFFER, offset * sizeof(T), sizeof(T), &data);
+        Gum::Graphics::VertexBufferObject::setSingleDataNative(iSizeOfType, &data, offset);
         unbind();
     }
 

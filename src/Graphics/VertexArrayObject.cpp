@@ -17,23 +17,24 @@ VertexArrayObject::~VertexArrayObject()
 }
 
 
-unsigned int VertexArrayObject::addElementBuffer(ElementBufferObject* elembuffer, unsigned int usage)
+unsigned int VertexArrayObject::addElementBuffer(ElementBufferObject* elembuffer)
 {
     iRenderCount = elembuffer->getLength();
     iIndexBuffer = elembuffer->getID();
+    updateRenderCount();
     return elembuffer->getID();
 }
 
 void VertexArrayObject::updateRenderCount()
 {
-    if(iIndexBuffer == 0)
+    /*if(iIndexBuffer == 0)
     {
         int divider = (iPrimitiveType == PrimitiveTypes::LINES) ? 2 
                     : (iPrimitiveType == PrimitiveTypes::TRIANGLES) ? 3 
                     : (iPrimitiveType == PrimitiveTypes::QUADS) ? 4
                     : 1;
         iRenderCount = iVertexCount / divider;
-    }
+    }*/
     if(pOnRenderCountFunc != nullptr)
         pOnRenderCountFunc();
 }
@@ -41,7 +42,7 @@ void VertexArrayObject::updateRenderCount()
 //
 // Setter
 //
-void VertexArrayObject::setVertexCount(const unsigned int& count)       { this->iVertexCount = count; updateRenderCount(); }
+void VertexArrayObject::setVertexCount(const unsigned int& count)       { this->iVertexCount = count; this->iRenderCount = count; updateRenderCount(); }
 void VertexArrayObject::setPrimitiveType(const unsigned int& type)      { this->iPrimitiveType = type; updateRenderCount(); }
 void VertexArrayObject::onRenderCountUpdate(std::function<void()> func) { this->pOnRenderCountFunc = func; }
 

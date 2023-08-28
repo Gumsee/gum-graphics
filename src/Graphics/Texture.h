@@ -3,6 +3,7 @@
 #include <list>
 #include <mutex>
 #include <vector>
+#include "Variables.h"
 
 class Texture
 {
@@ -25,13 +26,6 @@ public:
         NEAREST_MIPMAP_LINEAR,
         NEAREST_MIPMAP_NEAREST,
     };
-
-	struct Datatypes
-	{
-		static const uint16_t UNSIGNED_CHAR;
-		static const uint16_t FLOAT;
-		static const uint16_t INTEGER;
-	};
 
 	struct Pixelformat
 	{
@@ -61,6 +55,7 @@ protected:
 	bool bNeedsFreeing;
     bool bIsGrayscale;
     bool bIsMipmapped;
+    unsigned short iCurrentMipmapLevel;
 
 public:
 	Texture(Types type, uint16_t datatype);
@@ -82,6 +77,7 @@ public:
 	void setID(const int& id);
     void markLoaded();
     void setGrayscale(const bool& isgrayscale);
+    void setActiveMipmapLevel(const unsigned short& level);
 
 	//Getter
 	Types getType() const;

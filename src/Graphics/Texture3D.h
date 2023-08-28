@@ -10,7 +10,7 @@ protected:
 
 
 public:	
-	Texture3D(std::string name = "unknown", uint16_t datatype = Datatypes::UNSIGNED_CHAR);
+	Texture3D(std::string name = "unknown", uint16_t datatype = Gum::Graphics::Datatypes::UNSIGNED_CHAR);
 
     void updateImage();
 	void load(std::string TexFilepath, bool wait);

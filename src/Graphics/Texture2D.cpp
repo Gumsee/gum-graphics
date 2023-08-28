@@ -1,5 +1,4 @@
 #include "Texture2D.h"
-#include <GL/glew.h>
 #include <iostream>
 #include <future>
 #include "WrapperFunctions.h"
@@ -91,7 +90,7 @@ void Texture2D::initEmpty()
 //
 // Setter
 //
-void Texture2D::setData(unsigned char* data)                            { this->vPixelData = data; }
+void Texture2D::setData(void* data)  { this->vPixelData = data; updateImage(); }
 void Texture2D::setSize(const ivec2& size)
 { 
     /*size_t oldDataSize = v2Size.x * v2Size.y * iChannels;

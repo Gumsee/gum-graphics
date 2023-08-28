@@ -8,7 +8,12 @@
 namespace Gum {
 namespace Graphics
 {
-    static void addFramebufferToWindow(Gum::Window* window)
+    extern void enableFeature(const unsigned int& feature);
+    extern void disableFeature(const unsigned int& feature);
+    extern void renderWireframe(const bool wireframe);
+    extern void cullBackside(const bool cullback);
+
+    static void __attribute__ ((unused)) addFramebufferToWindow(Gum::Window* window)
     {
         Framebuffer* framebuffer = new Framebuffer(window->getSize(), true);
         framebuffer->bind();

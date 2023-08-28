@@ -1,6 +1,5 @@
 #include "Texture.h"
 #include "WrapperFunctions.h"
-#include <GL/glew.h>
 #include <iostream>
 
 
@@ -13,6 +12,7 @@ Texture::Texture(Types type, uint16_t datatype)
 	this->bIsGrayscale = false;
     this->bIsMipmapped = false;
 	this->iTextureID = 0;
+    this->iCurrentMipmapLevel = 0;
 	this->sName = "EmptyTexture";
     createNative();
 }
@@ -41,10 +41,11 @@ void Texture::createMipmaps()
 //
 // Setter
 //
-void Texture::setName(const std::string& name)	    { this->sName = name; }
-void Texture::setID(const int& id) 				    { this->iTextureID = id; }
-void Texture::markLoaded()                          { this->bLoaded = true; }
-void Texture::setGrayscale(const bool& isgrayscale) { this->bIsGrayscale = isgrayscale; }
+void Texture::setName(const std::string& name)	                { this->sName = name; }
+void Texture::setID(const int& id) 				                { this->iTextureID = id; }
+void Texture::markLoaded()                                      { this->bLoaded = true; }
+void Texture::setGrayscale(const bool& isgrayscale)             { this->bIsGrayscale = isgrayscale; }
+void Texture::setActiveMipmapLevel(const unsigned short& level) { this->iCurrentMipmapLevel = level; }
 
 
 //

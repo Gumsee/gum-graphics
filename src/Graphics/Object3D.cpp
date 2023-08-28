@@ -1,16 +1,30 @@
 #include "Object3D.h"
 #include "ElementBufferObject.h"
 #include "System/Output.h"
+#include "Variables.h"
 #include <Essentials/Tools.h>
 #include <System/MemoryManagement.h>
 #include <Codecs/Scene3DLoader.h>
 #include <string>
 
 
+Object3D::RenderFunc Object3D::pRenderStripFunc = [](Object3D* obj) {
+    obj->pVertexArrayObject->render(obj->vInstances.size());
+};
+Object3D::RenderFunc Object3D::pRenderTessellatedStripFunc = [](Object3D* obj) {
+    obj->pVertexArrayObject->renderTesselated(obj->vInstances.size());
+};
+Object3D::RenderFunc Object3D::pRenderIndexedFunc = [](Object3D* obj) {
+    obj->pVertexArrayObject->renderIndexed(obj->vInstances.size());
+};
+Object3D::RenderFunc Object3D::pRenderTessellatedIndexedFunc = [](Object3D* obj) {
+    obj->pVertexArrayObject->renderTesselatedIndexed(obj->vInstances.size());
+};
+
 Object3D::Object3D()
 {
     pIndexBuffer = nullptr;
-    pVertexArrayObject = new VertexArrayObject();
+    pVertexArrayObject = new VertexArrayObject(VertexArrayObject::PrimitiveTypes::TRIANGLES);
     pVertexArrayObject->onRenderCountUpdate([this]() {
         selectRenderFunc();
     });
@@ -75,18 +89,18 @@ void Object3D::load()
 		//Binding
         pVertexArrayObject->bind();
         pVertexVBO = new VertexBufferObject<Vertex>();
-		pVertexVBO->setData(pMesh->getVertexBuffer());
-        pVertexArrayObject->addAttribute(pVertexVBO, 0, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, position.x));
-        pVertexArrayObject->addAttribute(pVertexVBO, 1, 2, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, textureCoord.x));
-        pVertexArrayObject->addAttribute(pVertexVBO, 2, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, normal.x));
-        pVertexArrayObject->addAttribute(pVertexVBO, 7, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, tangent.x));
+		pVertexVBO->setData(pMesh->getVertexBuffer(), Gum::Graphics::DataState::STATIC);
+        pVertexArrayObject->addAttribute(pVertexVBO, 0, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, position.x));
+        pVertexArrayObject->addAttribute(pVertexVBO, 1, 2, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, textureCoord.x));
+        pVertexArrayObject->addAttribute(pVertexVBO, 2, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, normal.x));
+        pVertexArrayObject->addAttribute(pVertexVBO, 7, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, tangent.x));
         
         pTransMatricesVBO = new VertexBufferObject<mat4>();
 		//pTransMatricesVBO->setData(vTransforms, GL_STREAM_DRAW);
-		pVertexArrayObject->addAttributeMat4(pTransMatricesVBO, 3, GL_FLOAT, 1);
+		pVertexArrayObject->addAttributeMat4(pTransMatricesVBO, 3, Gum::Graphics::Datatypes::FLOAT, 1);
 
 		pIndividualColorsVBO = new VertexBufferObject<vec4>();
-		pVertexArrayObject->addAttribute(pIndividualColorsVBO, 10, 4, GL_FLOAT, sizeof(vec4), 0, 1);
+		pVertexArrayObject->addAttribute(pIndividualColorsVBO, 10, 4, Gum::Graphics::Datatypes::FLOAT, sizeof(vec4), 0, 1);
 
         pVertexArrayObject->setVertexCount(pVertexVBO->getLength());
 
@@ -129,10 +143,10 @@ Object3DInstance* Object3D::addInstance(Object3DInstance* instance)
 {
 	vInstances.push_back(instance);
 	vTransforms.push_back(instance->getMatrix());
-	pTransMatricesVBO->setData(vTransforms, GL_DYNAMIC_DRAW);
+	pTransMatricesVBO->setData(vTransforms, Gum::Graphics::DataState::DYNAMIC);
     
 	vIndividualColors.push_back(instance->getIndividualColor());
-	pIndividualColorsVBO->setData(vIndividualColors);
+	pIndividualColorsVBO->setData(vIndividualColors, Gum::Graphics::DataState::STATIC);
 
     if(pAddInstanceCallback != nullptr)
         pAddInstanceCallback(instance);
@@ -159,7 +173,7 @@ void Object3D::applyTransformationMatrix(Object3DInstance *inst)
         }
     }
 
-    pTransMatricesVBO->setData(vTransforms); //Make more efficient
+    pTransMatricesVBO->setData(vTransforms, Gum::Graphics::DataState::STATIC); //Make more efficient
 }
 
 void Object3D::selectRenderFunc()

@@ -5,7 +5,7 @@ class TextureHDR : public Texture2D
 {
 public:
     TextureHDR(std::string name = "unknown")
-        : Texture2D(name, Datatypes::FLOAT)
+        : Texture2D(name, Gum::Graphics::Datatypes::FLOAT)
     {
         this->iType = TEXTUREHDR;
         clampToEdge();

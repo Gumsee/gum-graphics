@@ -33,7 +33,7 @@ public:
 
 
 	void use();
-	void unuse();
+	static void unuse();
 
 	void loadUniform(const std::string& uniformName, const bool& var);
 	void loadUniform(const std::string& uniformName, const vec2& var);

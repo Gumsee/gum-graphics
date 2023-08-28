@@ -2,6 +2,7 @@
 #include "ElementBufferObject.h"
 #include "System/MemoryManagement.h"
 #include "System/Output.h"
+#include "Variables.h"
 #include "VertexArrayObject.h"
 
 
@@ -11,20 +12,20 @@ Sprite2D::Sprite2D()
     pTexture = nullptr;
     if(pVertexArrayObject == nullptr)
     {
-        pVertexArrayObject = new VertexArrayObject();
+        pVertexArrayObject = new VertexArrayObject(VertexArrayObject::PrimitiveTypes::TRIANGLES);
         
         pVertexArrayObject->bind();
         VertexBufferObject<float> pVertexVBO;
-		pVertexVBO.setData(afSpriteVertices);
-        pVertexArrayObject->addAttribute(&pVertexVBO, 0, 2, GL_FLOAT, 0, 0);
+		pVertexVBO.setData(afSpriteVertices, Gum::Graphics::DataState::STATIC);
+        pVertexArrayObject->addAttribute(&pVertexVBO, 0, 2, Gum::Graphics::Datatypes::FLOAT, 0, 0);
         pVertexArrayObject->setVertexCount(pVertexVBO.getLength());
         
         pTransMatricesVBO = new VertexBufferObject<mat3>();
 		//pTransMatricesVBO->setData(vTransforms, GL_STREAM_DRAW);
-		pVertexArrayObject->addAttributeMat3(pTransMatricesVBO, 1, GL_FLOAT, 1);
+		pVertexArrayObject->addAttributeMat3(pTransMatricesVBO, 1, Gum::Graphics::Datatypes::FLOAT, 1);
 
 		pIndividualColorsVBO = new VertexBufferObject<vec4>();
-		pVertexArrayObject->addAttribute(pIndividualColorsVBO, 5, 4, GL_FLOAT, sizeof(vec4), 0, 1);
+		pVertexArrayObject->addAttribute(pIndividualColorsVBO, 5, 4, Gum::Graphics::Datatypes::FLOAT, sizeof(vec4), 0, 1);
 
         pIndexBuffer = new ElementBufferObject();
         pIndexBuffer->setData(aiSpriteIndices);
@@ -46,10 +47,10 @@ Sprite2DInstance* Sprite2D::addInstance(Sprite2DInstance* instance)
 {
 	vInstances.push_back(instance);
 	vTransforms.push_back(instance->getMatrix());
-	pTransMatricesVBO->setData(vTransforms, GL_DYNAMIC_DRAW);
+	pTransMatricesVBO->setData(vTransforms, Gum::Graphics::DataState::DYNAMIC);
     
 	vIndividualColors.push_back(instance->getIndividualColor());
-	pIndividualColorsVBO->setData(vIndividualColors);
+	pIndividualColorsVBO->setData(vIndividualColors, Gum::Graphics::DataState::STATIC);
 
     if(pAddInstanceCallback != nullptr)
         pAddInstanceCallback(instance);
@@ -76,7 +77,7 @@ void Sprite2D::applyTransformationMatrix(Sprite2DInstance *inst)
         }
     }
 
-    pTransMatricesVBO->setData(vTransforms); //Make more efficient
+    pTransMatricesVBO->setData(vTransforms, Gum::Graphics::DataState::STATIC); //Make more efficient
 }
 
 //Rendering stuff

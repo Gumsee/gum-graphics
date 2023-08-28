@@ -8,7 +8,7 @@ TextureCube::TextureCube(std::string name, uint16_t datatype)
     : Texture(TEXTURECUBE, datatype)
 {
 	this->sName = name;
-	for(int i = 0; i < 0; i++)
+	for(int i = 0; i < 6; i++)
 	{
 		bNeedsFreeing[i] = false;
     	vPixelData[i] = nullptr;
@@ -82,8 +82,5 @@ void TextureCube::setSize(ivec2 size, int side)
 void TextureCube::setSize(ivec2 size)
 {
     for(int i = 0; i < 6; i++)
-    {
-        v2Size[i] = size;
-        updateImage(i);
-    }
+        setSize(size, i);
 }

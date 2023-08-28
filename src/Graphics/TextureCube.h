@@ -13,15 +13,15 @@ protected:
 
 
 public:
-	TextureCube(std::string name = "unknown", uint16_t datatype = Datatypes::UNSIGNED_CHAR);
+	TextureCube(std::string name = "unknown", uint16_t datatype = Gum::Graphics::Datatypes::UNSIGNED_CHAR);
 	~TextureCube();
 
 	void bind(const int& index = 0);
 	void unbind(const int& index = 0);
+	static void unbindGlobal(const int& index = 0);
     
     void repeat(bool mirrored = false);
     void clampToEdge(bool border = false);
-    void createMipmaps();
     void setFiltering(FilteringTypes filteringtype);
 	
     void updateImage();

@@ -10,7 +10,7 @@ protected:
 	ivec2 v2Size;
 
 public:
-	TextureDepth(std::string name = "unknown", uint16_t datatype = Datatypes::UNSIGNED_CHAR);
+	TextureDepth(std::string name = "unknown", uint16_t datatype = Gum::Graphics::Datatypes::UNSIGNED_CHAR);
 	~TextureDepth();
 
     void updateImage() override;
