@@ -29,10 +29,10 @@ public:
 
 	struct Pixelformat
 	{
-		static const uint16_t BGRA;
 		static const uint16_t RGBA;
 		static const uint16_t RGB;
-		static const uint16_t BGR;
+		//static const uint16_t BGRA;
+		//static const uint16_t BGR;
 		static const uint16_t RG;
 		static const uint16_t R;
 		static const uint16_t RGBA16F;
