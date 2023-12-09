@@ -61,7 +61,7 @@ public:
 	Texture(Types type, uint16_t datatype);
 	virtual ~Texture();
 
-    virtual void updateImage() { std::cout << "wrong" << std::endl; }
+    virtual void updateImage() { /* Empty */ }
 	virtual void bind(const int& index = 0) {}
 	virtual void unbind(const int& index = 0) {}
 

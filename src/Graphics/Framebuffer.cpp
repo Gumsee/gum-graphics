@@ -12,6 +12,7 @@ Framebuffer::Framebuffer(const ivec2& size, bool iswindow)
     this->iID = 0;
     this->iDepthBufferID = 0;
     this->pDepthTexture = nullptr;
+    this->bbRenderArea = bbox2i(ivec2(0,0), size);
 
     if(!iswindow)
     {
@@ -51,6 +52,7 @@ void Framebuffer::updateMatrix()
 void Framebuffer::setOffset(ivec2 offset)               { this->v2Offset = offset; }
 void Framebuffer::setSize(ivec2 size)                   { this->v2Size = size; updateMatrix(); resizeTextures(); }
 void Framebuffer::setClearColor(color clearcolor)       { this->cClearColor = clearcolor; }
+void Framebuffer::setRenderArea(const bbox2i& area)     { this->bbRenderArea = area; gumScissor(area); }
 
 
 //
@@ -68,3 +70,4 @@ float Framebuffer::getAspectRatio()        	            { return this->fAspectRa
 float Framebuffer::getAspectRatioWidthToHeight()        { return this->fAspectRatioWidthToHeight; }
 vec2 Framebuffer::getPixelSize() const          		{ return this->v2PixelSize; }
 color Framebuffer::getClearColor() const                { return this->cClearColor; }
+bbox2i Framebuffer::getRenderArea() const               { return this->bbRenderArea; }

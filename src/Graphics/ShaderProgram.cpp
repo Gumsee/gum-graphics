@@ -2,8 +2,9 @@
 #include <System/Output.h>
 #include <System/MemoryManagement.h>
 
-ShaderProgram::ShaderProgram()  
+ShaderProgram::ShaderProgram(bool internal)  
 {
+    bIsInternal = internal;
     createNative();
 }
 
@@ -89,7 +90,8 @@ void ShaderProgram::setCurrentlyBoundShader(ShaderProgram* program) { pCurrently
 //
 // Getter
 //
-std::string ShaderProgram::getName() const           				{ return sName; }
-unsigned int ShaderProgram::getProgramID() const           			{ return iProgramID; }
-ShaderProgram* ShaderProgram::getCurrentlyBoundShader() 			{ return pCurrentlyBoundShaderProgram; }
+std::string ShaderProgram::getName() const           				{ return this->sName; }
+unsigned int ShaderProgram::getProgramID() const           			{ return this->iProgramID; }
 Shader* ShaderProgram::getShader(int index) 						{ return this->vShaders[index]; }
+bool ShaderProgram::isInternal()                                    { return this->bIsInternal; }
+ShaderProgram* ShaderProgram::getCurrentlyBoundShader() 			{ return pCurrentlyBoundShaderProgram; }

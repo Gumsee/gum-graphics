@@ -33,7 +33,7 @@ public:
     //Setter
     void setSize(const ivec2& size);
     void setData(void* data);
-    void setPixel(const int& x, const int& y, const vec4& color);
+    void setPixel(const int& x, const int& y, const color& col);
     void setNumChannels(const int& channels);
 
     //Getter

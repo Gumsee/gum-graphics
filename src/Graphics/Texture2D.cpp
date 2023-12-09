@@ -105,13 +105,13 @@ void Texture2D::setSize(const ivec2& size)
     updateImage(); 
 }
 
-void Texture2D::setPixel(const int& x, const int& y, const vec4& color) 
+void Texture2D::setPixel(const int& x, const int& y, const color& col) 
 {
     unsigned int pos = v2Size.x * y * iChannels + x * iChannels;
     if(pos >= v2Size.x * v2Size.y * iChannels)
         return;
     for(unsigned int i = 0; i < iChannels; i++)
-        ((unsigned char*)vPixelData)[pos + i] = color[i] * 255;
+        ((unsigned char*)vPixelData)[pos + i] = col[i];
 }
 void Texture2D::setNumChannels(const int& channels)
 {

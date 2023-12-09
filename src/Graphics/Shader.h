@@ -34,4 +34,7 @@ public:
     std::string getSourceCode();
     unsigned int getShaderType();
     unsigned int getShaderID();
+
+    //Setter
+    void setSourceCode(std::string code);
 };

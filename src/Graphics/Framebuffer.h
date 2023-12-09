@@ -1,5 +1,6 @@
 #pragma once
 #include <gum-maths.h>
+#include "Maths/bbox.h"
 #include "TextureDepth.h"
 #include "TextureCube.h"
 #include "Texture2D.h"
@@ -33,6 +34,7 @@ private:
     ivec2 v2Size;
     ivec2 v2Offset;
     vec2 v2PixelSize;
+    bbox2i bbRenderArea;
     color cClearColor;
 
     std::unordered_map<uint8_t, Texture*> mTextureAttachments;
@@ -77,6 +79,8 @@ public:
     void setOffset(ivec2 offset);
     void setSize(ivec2 size);
     void setClearColor(color clearcolor);
+    void setRenderArea(const bbox2i& area);
+
 
     //Getter
     Texture* getTextureAttachment(int index = 0);
@@ -92,4 +96,5 @@ public:
     color getPixel(ivec2 pos);
     vec2 getPixelSize() const;
     color getClearColor() const;
+    bbox2i getRenderArea() const;
 };

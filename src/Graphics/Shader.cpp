@@ -17,7 +17,16 @@ Shader::~Shader()
     destroyNative();
 }
 
+
+//
 //Getter
-std::string Shader::getSourceCode()  { return this->sSource; }
-unsigned int Shader::getShaderType() { return this->iType; }
-unsigned int Shader::getShaderID()   { return this->iShaderID; }
+//
+std::string Shader::getSourceCode()          { return this->sSource; }
+unsigned int Shader::getShaderType()         { return this->iType; }
+unsigned int Shader::getShaderID()           { return this->iShaderID; }
+
+
+//
+// Setter
+//
+void Shader::setSourceCode(std::string code) { this->sSource = code; }

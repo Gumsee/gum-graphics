@@ -12,6 +12,7 @@ private:
 	std::vector<Shader*> vShaders;
 	std::map<std::string, int> Locations;
 	std::map<std::string, int> Attributes;
+    bool bIsInternal;
 
 	unsigned int iProgramID;
 	std::string sName;
@@ -23,7 +24,7 @@ private:
 	inline static ShaderProgram* pCurrentlyBoundShaderProgram = nullptr;
 
 public:
-	ShaderProgram();
+	ShaderProgram(bool internal);
 	~ShaderProgram();
 
 	void addAttribute(const std::string& attributeName, const int& number);
@@ -67,5 +68,6 @@ public:
 	unsigned int getProgramID() const;
 	static ShaderProgram* getCurrentlyBoundShader();
 	Shader* getShader(int index);
+    bool isInternal();
 };
 
