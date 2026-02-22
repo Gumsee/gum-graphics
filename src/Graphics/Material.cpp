@@ -1,4 +1,10 @@
 #include "Material.h"
+#include <Essentials/Serialization.h>
+#include "System/Filesystem.h"
+#include "Texture2D.h"
+#include <System/File.h>
+#include <System/Output.h>
+#include <Codecs/Zip.h>
 
 
 Material::Material()
@@ -6,14 +12,13 @@ Material::Material()
 	sName = "";
 	fReflectivity = 0.0f;
 	fRefractivity = 0.0f;
-	fSpecularity = 0.3f;
-	fRoughness = 0.8f;
+	fSpecularity = 0;//0.3f;
+	fRoughness = 0;//0.8f;
 	iTextureMultiplier = 1;
 	bTransparency = false;
 	bFlipNormal = false;
-	vColor = vec4(0.3,0.3,0.3,1);
+	vColor = rgba(100, 100, 100, 255);
 
-	textures.resize(16);
 	iNumUsableTextures = 14;
 
 	bHasNormalMap = false;
@@ -27,27 +32,76 @@ Material::Material()
 	bHasTexture = false;
 }
 
-Material::~Material() {}
 
+Material::Material(Gum::Filesystem::File materialfile)
+    : Material()
+{
+    if(!Gum::Filesystem::fileExists(materialfile))
+    {
+        Gum::Output::error("Material: cannot read file: " + materialfile.toString() + " is not a file!");
+        return;
+    }
+
+    std::vector<unsigned char> bytes;
+    Gum::Codecs::unzip(materialfile, [&bytes](const char* data, const unsigned int len) {
+        for(unsigned int i = 0; i < len; i++)
+            bytes.push_back(data[i]);
+    });
+
+    SerializationData ndata(bytes.data(), bytes.size());
+    ndata >> *this;
+}
+
+Material::~Material()
+{
+
+}
+
+
+void Material::saveToFile(const Gum::Filesystem::File& file, const unsigned int& filetype)
+{
+    if(file.getType() != Gum::Filesystem::Filetype::FILE)
+    {
+        Gum::Output::error("Material: cannot save to file: " + file.toString() + " is not a file!");
+        return;
+    }
+
+    std::stringstream stream;
+
+    SerializationData data;
+    data << *this;
+    unsigned int len = 0;
+    unsigned char* bytes = data.getData(len);
+    for(unsigned int i = 0; i < len; i++)
+        stream << bytes[i];
+
+    Gum::Codecs::zip(file, 7, stream);
+}
+
+
+//
 //Getter
-bool Material::isReflective() 								{ return fReflectivity > 0; }
-bool Material::isRefractive() 								{ return fRefractivity > 0; }
-bool Material::isTransparent() 								{ return bTransparency; }
-bool Material::hasFlippedNormals()							{ return bFlipNormal; }
-float *Material::getSpecularity() 							{ return &fSpecularity; }
-float *Material::getRoughness() 							{ return &fRoughness; }
-float *Material::getReflectivity()							{ return &fReflectivity; }
-float *Material::getRefractivity()							{ return &fRefractivity; }
-int Material::getTextureMultiplier()						{ return iTextureMultiplier; }
+//
+bool Material::isReflective() 								{ return this->fReflectivity > 0.0f; }
+bool Material::isRefractive() 								{ return this->fRefractivity > 0.0f; }
+bool Material::isTransparent() 								{ return this->bTransparency; }
+bool Material::hasFlippedNormals()							{ return this->bFlipNormal; }
+float& Material::getSpecularity() 							{ return this->fSpecularity; }
+float& Material::getRoughness() 							{ return this->fRoughness; }
+float& Material::getReflectivity()							{ return this->fReflectivity; }
+float& Material::getRefractivity()							{ return this->fRefractivity; }
+int Material::getTextureMultiplier()						{ return this->iTextureMultiplier; }
 std::string Material::getName() 							{ return this->sName; }
-vec4 Material::getColor()								    { return this->vColor; }
-vec4 *Material::getColorPtr()							    { return &this->vColor; }
-Texture* Material::getTexture(int index) 					{ return this->textures[index]; }
-int Material::numTextures() 								{ return iNumUsableTextures; }
+color Material::getColor()								    { return this->vColor; }
+Texture* Material::getTexture(int index) 					{ return this->mTextures[index]; }
+int Material::numTextures() 								{ return this->iNumUsableTextures; }
 
+
+//
 //Setter
+//
 void Material::setName(std::string name) 					{ this->sName = name; }
-void Material::setColor(vec4 color)					        { this->vColor = color; }
+void Material::setColor(color col)					        { this->vColor = col; }
 void Material::setSpecularity(float specularity)			{ this->fSpecularity = specularity; }
 void Material::setRoughness(float roughness)				{ this->fRoughness = roughness; }
 void Material::setReflectivity(float reflectivity)			{ this->fReflectivity = reflectivity; }
@@ -73,62 +127,51 @@ void Material::flipNormals(bool shouldFlip)					{ this->bFlipNormal = shouldFlip
 	Texture unit 7 is always the ambient occlusion Texture called "ambientOcclusionmap"
 	
 */
-void Material::setTexture(Texture *Tex, int Index)
+void Material::setTexture(Texture *tex, int index)
 {
-	textures[Index] = Tex;
-	if(Tex != nullptr)
-	{
-		if(Index == 14) 		{ this->bHasNormalMap = true; }
-		else if(Index == 13) 	{ this->bHasDisplacementMap = true; }
-		else if(Index == 12) 	{ this->bHasBlendMap = true; }
-		else if(Index == 11) 	{ this->bHasReflectionMap = true; }
-		else if(Index == 10) 	{ this->bHasRefractionMap = true;	}
-		else if(Index == 9) 	{ this->bHasSpecularMap = true; }
-		else if(Index == 8)		{ this->bHasRoughnessMap = true; }
-		else if(Index == 7)		{ this->bHasAmbientOcclusionMap = true; }
-		else if(Index < 7)		{ this->bHasTexture = true;}
-	}
-	else
-	{
-		delTexture(Index);
-	}
+    if(tex == nullptr)
+    {
+		delTexture(index);
+        return;
+    }
+
+	mTextures[index] = tex;
+
+    if     (index == GUM_MATERIAL_NORMAL_MAP)            { this->bHasNormalMap = true; }
+    else if(index == GUM_MATERIAL_DISPLACEMENT_MAP)      { this->bHasDisplacementMap = true; }
+    else if(index == GUM_MATERIAL_BLEND_MAP) 	         { this->bHasBlendMap = true; }
+    else if(index == GUM_MATERIAL_REFLECTION_MAP) 	     { this->bHasReflectionMap = true; }
+    else if(index == GUM_MATERIAL_REFRACTION_MAP) 	     { this->bHasRefractionMap = true;	}
+    else if(index == GUM_MATERIAL_SPECULAR_MAP) 	     { this->bHasSpecularMap = true; }
+    else if(index == GUM_MATERIAL_ROUGHNESS_MAP)	     { this->bHasRoughnessMap = true; }
+    else if(index == GUM_MATERIAL_AMBIENT_OCCLUSION_MAP) { this->bHasAmbientOcclusionMap = true; }
+    else if(index <  GUM_MATERIAL_AMBIENT_OCCLUSION_MAP) { this->bHasTexture = true;}
 }
 
-void Material::delTexture(int Index)
+void Material::delTexture(int index)
 {
-	//Textures.erase(Textures.begin() + Index);
-	textures[Index] = nullptr;
+	mTextures.erase(mTextures.find(index));
 
-	if(Index == 14)			{ this->bHasNormalMap = false;	}
-	else if(Index == 13) 	{ this->bHasDisplacementMap = false; }
-	else if(Index == 12) 	{ this->bHasBlendMap = false; }
-	else if(Index == 11)	{ this->bHasReflectionMap = false;	}
-	else if(Index == 10)	{ this->bHasRefractionMap = false; }
-	else if(Index == 9)		{ this->bHasSpecularMap = false; }
-	else if(Index == 8)		{ this->bHasRoughnessMap = false; }
-	else if(Index == 7)		{ this->bHasAmbientOcclusionMap = false; }
-	else if(Index < 7)		{ this->bHasTexture = false;}
+	if     (index == GUM_MATERIAL_NORMAL_MAP)		     { this->bHasNormalMap = false;	}
+	else if(index == GUM_MATERIAL_DISPLACEMENT_MAP)      { this->bHasDisplacementMap = false; }
+	else if(index == GUM_MATERIAL_BLEND_MAP) 	         { this->bHasBlendMap = false; }
+	else if(index == GUM_MATERIAL_REFLECTION_MAP)	     { this->bHasReflectionMap = false;	}
+	else if(index == GUM_MATERIAL_REFRACTION_MAP)	     { this->bHasRefractionMap = false; }
+	else if(index == GUM_MATERIAL_SPECULAR_MAP)		     { this->bHasSpecularMap = false; }
+	else if(index == GUM_MATERIAL_ROUGHNESS_MAP)	     { this->bHasRoughnessMap = false; }
+	else if(index == GUM_MATERIAL_AMBIENT_OCCLUSION_MAP) { this->bHasAmbientOcclusionMap = false; }
+	else if(index <  GUM_MATERIAL_AMBIENT_OCCLUSION_MAP) { this->bHasTexture = false; }
 }
 
 void Material::bindTextures()
 {
-	for (size_t i = 0; i < textures.size(); i++)
-	{
-		if(textures[i] != nullptr)
-		{
-			textures[i]->bind(i);
-		}
-	}
+	for (auto it : mTextures)
+        it.second->bind(it.first);
 }
 void Material::unbindTextures()
 {
-	for (size_t i = 0; i < textures.size(); i++)
-	{
-		if(textures[i] != nullptr)
-		{
-			textures[i]->bind(i);
-		}
-	}
+	for (auto it : mTextures)
+        it.second->unbind(it.first);
 }
 
 bool Material::hasNormalMap() 			{ return this->bHasNormalMap; }
@@ -140,3 +183,49 @@ bool Material::hasDisplacementMap() 	{ return this->bHasDisplacementMap; }
 bool Material::hasAmbientOcclusionMap() { return this->bHasAmbientOcclusionMap; }
 bool Material::hasBlendMap() 			{ return this->bHasBlendMap; }
 bool Material::hasTexture() 			{ return this->bHasTexture; }
+
+void Material::onDeserialize()
+{
+
+}
+
+SerializationData& Material::serialize(SerializationData& data)
+{
+    data & sName & fReflectivity & fRefractivity & fSpecularity & fRoughness & iTextureMultiplier & iNumUsableTextures & bTransparency & bFlipNormal;
+
+    int numtex = mTextures.size();
+    data & numtex;
+    
+    if(data.isSavingData())
+    {
+        for(auto it : mTextures)
+        {
+            int type = it.second->getType();
+            int uniform = it.first;
+            data & uniform & type & *it.second;
+        }
+    }
+    else
+    {
+        for(int i = 0; i < numtex; i++)
+        {
+            int type = 0;
+            int uniform = 0;
+            data & uniform & type;
+            Texture* tex = nullptr;
+            switch(static_cast<Texture::Type>(type))
+            {
+                case Texture::TEXTURE2D: tex = new Texture2D(); break;
+                case Texture::TEXTURE3D:
+                case Texture::TEXTURECUBE:
+                case Texture::TEXTUREHDR:
+                default: break;
+            }
+            data & *tex;
+            setTexture(tex, uniform);
+        }
+    }
+
+    return data;
+    //return data & fRoughness & fSpecularity;
+}

@@ -1,10 +1,14 @@
 #pragma once
+#include "Uniform.h"
 #include <string>
+#include <vector>
+
+#define GUM_SHADER_VERSION_STR "#version 450 core \n"
+#define GLSL(str) GUM_SHADER_VERSION_STR #str
 
 class Shader
 {
 public:
-    inline static const std::string SHADER_VERSION_STR = "#version 450 core \n";
     struct TYPES 
     {
         static const unsigned int VERTEX_SHADER;
@@ -20,6 +24,7 @@ private:
     unsigned int iType;
     unsigned int iShaderID;
     bool bIsCompiled = false;
+    std::vector<Uniform> vUniforms;
 
     void createNative();
     void destroyNative();
@@ -33,7 +38,9 @@ public:
     //Getter
     std::string getSourceCode();
     unsigned int getShaderType();
+    std::string getShaderTypeStr();
     unsigned int getShaderID();
+    std::vector<Uniform>& getUniforms();
 
     //Setter
     void setSourceCode(std::string code);

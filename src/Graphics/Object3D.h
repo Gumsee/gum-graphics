@@ -2,13 +2,14 @@
 #include <functional>
 #include <gum-primitives.h>
 #include <Essentials/Settings.h>
-
+#include <Essentials/Serialization.h>
+#include "Essentials/SerializationData.h"
 #include "Renderable.h"
 #include "ShaderProgram.h"
 #include "VertexArrayObject.h"
 #include "Object3DInstance.h"
 
-class Object3D : public Renderable
+class Object3D : public Renderable, public Serialization
 {
 public:
     typedef void (*RenderFunc)(Object3D*);
@@ -41,8 +42,6 @@ protected:
     RenderFunc pRenderFunc;
     AddInstanceCallback pAddInstanceCallback;
 
-
-	//Technical	(OpenGL)
 	Mesh *pMesh = nullptr;
 
 
@@ -51,11 +50,12 @@ protected:
     void selectRenderFunc();
 
 public:
-	Object3D(std::string ModelFilePath, std::string name);
+	Object3D(const Gum::File& modelFile, const std::string& name);
 	Object3D(Mesh *mesh, std::string name);
 	virtual ~Object3D();
 
     void applyTransformationMatrix(Object3DInstance *inst);
+    void saveToFile(const Gum::Filesystem::File& file);
 
     virtual void prerender() override {};
 	virtual void render() override;
@@ -64,7 +64,6 @@ public:
 
 	Object3DInstance* addInstance();
 	Object3DInstance* operator++();
-	void RenderToShadowMap(bool var);
 
     //Setter
 	void setShaderProgram(ShaderProgram *shader);
@@ -79,4 +78,6 @@ public:
 	ShaderProgram* getShaderProgram();
 	unsigned int numInstances();
     VertexArrayObject* getVertexArrayObject();
+
+    virtual SerializationData& serialize(SerializationData& data) override;
 };

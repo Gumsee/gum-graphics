@@ -1,23 +1,27 @@
 #pragma once
 #include <gum-maths.h>
+#include <Essentials/Serialization.h>
 #include <list>
 #include <mutex>
-#include <vector>
-#include "Variables.h"
 
-class Texture
+class Texture : public Serialization
 {
-public:	
-	enum Types
-	{
-		TEXTURE2D,
-		TEXTURE3D,
-		TEXTURECUBE,
-		TEXTUREHDR,
-        TEXTUREDEPTH,
-	};
+public:
+    inline static const int MAX_PIXEL_COLOR = 256 * 256 * 256;
+    inline static std::list<Texture*> vToLoadTextures;
+    inline static std::mutex loadMutex;
 
-    enum FilteringTypes
+    enum Type
+    {
+        TEXTURE2D,
+        TEXTURE3D,
+        TEXTURECUBE,
+        TEXTUREHDR,
+        TEXTUREDEPTH2D,
+        TEXTUREDEPTH3D,
+    };
+
+    enum FilteringType
     {
         LINEAR,
         NEAREST_NEIGHBOR,
@@ -27,38 +31,23 @@ public:
         NEAREST_MIPMAP_NEAREST,
     };
 
-	struct Pixelformat
-	{
-		static const uint16_t RGBA;
-		static const uint16_t RGB;
-		//static const uint16_t BGRA;
-		//static const uint16_t BGR;
-		static const uint16_t RG;
-		static const uint16_t R;
-		static const uint16_t RGBA16F;
-		static const uint16_t RGBA32F;
-	};
-
 private:
     void createNative();
     void destroyNative();
 
 protected:
-	inline static const int MAX_PIXEL_COLOR = 256 * 256 * 256;
-    inline static std::list<Texture*> vToLoadTextures;
-    inline static std::mutex loadMutex;
+	Texture(std::string name, Type type);
+
 	unsigned int iTextureID;
-	Types iType;
-    uint16_t iDatatype;
+	unsigned int iType;
 	std::string sName;
 	bool bLoaded;
-	bool bNeedsFreeing;
     bool bIsGrayscale;
     bool bIsMipmapped;
+    bool bHasTransparency;
     unsigned short iCurrentMipmapLevel;
 
 public:
-	Texture(Types type, uint16_t datatype);
 	virtual ~Texture();
 
     virtual void updateImage() { /* Empty */ }
@@ -70,20 +59,24 @@ public:
     void createMipmaps();
     virtual void repeat(bool mirrored = false) {}
     virtual void clampToEdge(bool border = false) {}
-    virtual void setFiltering(FilteringTypes filteringtype) {}
+    virtual void setFiltering(FilteringType filteringtype) {}
+    
 
 	//Setter
 	void setName(const std::string& name);
 	void setID(const int& id);
     void markLoaded();
     void setGrayscale(const bool& isgrayscale);
+    void setTransparency(const bool& hastransparency);
     void setActiveMipmapLevel(const unsigned short& level);
 
 	//Getter
-	Types getType() const;
-	uint16_t getDatatype() const;
+	Type getType() const;
 	unsigned int getID() const;
 	std::string getName() const;
 	bool isLoaded() const;
     bool isGrayscale() const;
+    bool hasTransparency() const;
+
+    virtual SerializationData& serialize(SerializationData& data) override;
 };

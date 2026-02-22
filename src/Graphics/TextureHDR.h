@@ -1,11 +1,11 @@
 #pragma once
 #include "Texture2D.h"
 
-class TextureHDR : public Texture2D
+class TextureHDR : public Texture2Df
 {
 public:
     TextureHDR(std::string name = "unknown")
-        : Texture2D(name, Gum::Graphics::Datatypes::FLOAT)
+        : Texture2Df(name)
     {
         this->iType = TEXTUREHDR;
         clampToEdge();

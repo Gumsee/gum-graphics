@@ -4,42 +4,34 @@
 #include <future>
 #include <Codecs/TextureLoader.h>
 
-TextureCube::TextureCube(std::string name, uint16_t datatype)
-    : Texture(TEXTURECUBE, datatype)
+template<typename T>
+tTextureCube<T>::tTextureCube(std::string name)
+    : Texture(name, TEXTURECUBE)
 {
 	this->sName = name;
-	for(int i = 0; i < 6; i++)
-	{
-		bNeedsFreeing[i] = false;
-    	vPixelData[i] = nullptr;
-		iChannels[i] = 0;
-	}
     clampToEdge();
     setFiltering(LINEAR);
 }
 
-TextureCube::~TextureCube()
+template<typename T>
+tTextureCube<T>::~tTextureCube()
 {
-	for(int i = 0; i < 0; i++)
-	{
-		if(bNeedsFreeing[i] && vPixelData[i] != nullptr)
-			free(vPixelData[i]);
-	}
 }
 
-	
-void TextureCube::updateImage()
+template<typename T>
+void tTextureCube<T>::updateImage()
 {
 	for(int i = 0; i < 6; i++)
         updateImage(i);
 }
 
 
-void TextureCube::load(std::vector<std::string> texturepaths, bool wait)
+template<typename T>
+void tTextureCube<T>::load(std::vector<std::string> texturepaths, bool wait)
 {
 	if(texturepaths.size() != 6)
 	{
-		Gum::Output::error("TextureCube.load: Wrong amount of textures specified.");
+		Gum::Output::error("tTextureCube.load: Wrong amount of textures specified.");
 		return;
 	}
 
@@ -48,9 +40,9 @@ void TextureCube::load(std::vector<std::string> texturepaths, bool wait)
 		{
 			ImageData imageData = TextureLoader::loadImage(texturepaths[i]);
 			v2Size[i] = ivec2(imageData.width, imageData.height);
-			iChannels[i] = imageData.numComps;
-			vPixelData[i] = imageData.data;
-			bNeedsFreeing[i] = true;
+            Data::setNumChannels(imageData.numComps, i);
+            Data::setDataPtr((T*)imageData.data, i);
+            Data::setNeedsFreeing(true, i);
 		}
 
         vToLoadTextures.push_back(this);
@@ -68,18 +60,21 @@ void TextureCube::load(std::vector<std::string> texturepaths, bool wait)
 //
 // Setter
 //
-void TextureCube::setData(unsigned char* data, const unsigned int& side)
+template<typename T>
+void tTextureCube<T>::setData(T* data, const unsigned int& side)
 {
-	vPixelData[side] = data;
+    Data::setDataPtr(data, side);
 }
 
-void TextureCube::setSize(ivec2 size, int side)
+template<typename T>
+void tTextureCube<T>::setSize(ivec2 size, int side)
 {
     v2Size[side] = size;
     updateImage(side);
 }
 
-void TextureCube::setSize(ivec2 size)
+template<typename T>
+void tTextureCube<T>::setSize(ivec2 size)
 {
     for(int i = 0; i < 6; i++)
         setSize(size, i);

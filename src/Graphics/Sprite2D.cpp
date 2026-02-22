@@ -49,7 +49,7 @@ Sprite2DInstance* Sprite2D::addInstance(Sprite2DInstance* instance)
 	vTransforms.push_back(instance->getMatrix());
 	pTransMatricesVBO->setData(vTransforms, Gum::Graphics::DataState::DYNAMIC);
     
-	vIndividualColors.push_back(instance->getIndividualColor());
+	vIndividualColors.push_back(instance->getIndividualColor().getGLColor());
 	pIndividualColorsVBO->setData(vIndividualColors, Gum::Graphics::DataState::STATIC);
 
     if(pAddInstanceCallback != nullptr)

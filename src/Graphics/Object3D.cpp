@@ -5,6 +5,7 @@
 #include <Essentials/Tools.h>
 #include <System/MemoryManagement.h>
 #include <Codecs/Scene3DLoader.h>
+#include <Codecs/Zip.h>
 #include <string>
 
 
@@ -23,14 +24,16 @@ Object3D::RenderFunc Object3D::pRenderTessellatedIndexedFunc = [](Object3D* obj)
 
 Object3D::Object3D()
 {
-    pIndexBuffer = nullptr;
-    pVertexArrayObject = new VertexArrayObject(VertexArrayObject::PrimitiveTypes::TRIANGLES);
-    pVertexArrayObject->onRenderCountUpdate([this]() {
-        selectRenderFunc();
-    });
-
-	//Set attributes
 	this->pShader = nullptr;
+    this->pIndexBuffer = nullptr;
+
+    if(!Gum::Graphics::RUN_HEADLESS)
+    {
+        pVertexArrayObject = new VertexArrayObject(VertexArrayObject::PrimitiveTypes::TRIANGLES);
+        pVertexArrayObject->onRenderCountUpdate([this]() {
+            selectRenderFunc();
+        });
+    }
 }
 
 /** Loads the Object files content into memory and loads
@@ -38,19 +41,53 @@ Object3D::Object3D()
  *  @param[in] Shader Shader used to render object
  *  @param[in] name Identifier, also used in the objectmanager in most cases
  */
-Object3D::Object3D(std::string modelFilePath, std::string name) : Object3D()
+Object3D::Object3D(const Gum::File& modelFile, const std::string& name) : Object3D()
 {
-	//Create and add Properties
-	sName = name;
-	pMesh = new Mesh();
-	Scene3DLoader loader;
-    loader.iterateMeshes([this](unsigned int currentMesh, unsigned int numMeshes, Mesh* mesh, Bone* rootbone, std::vector<Bone*> bones) {
-		pMesh->addMesh(mesh);
-		Gum::_delete(mesh);
-    });
-    loader.load(modelFilePath);
+    if(modelFile.getType() != Gum::Filesystem::Filetype::FILE)
+    {
+        Gum::Output::error("Object3D: cannot read file: " + modelFile.toString() + " is not a file!");
+        return;
+    }
 
-	load();
+    std::string fileExtension = "";
+    std::vector<std::string> splitstr = Tools::splitStr(modelFile.toString(), '.');
+    if(splitstr.size() > 1)
+        fileExtension = splitstr[splitstr.size()-1];
+
+	//Create and add Properties
+    sName = name;
+    if(Tools::mapHasKey(Mesh::mLoadedMeshes, modelFile.toString()))
+    {
+        pMesh = Mesh::mLoadedMeshes[modelFile.toString()];
+    }
+    else if(fileExtension == "gumobj")
+    {
+        pMesh = new Mesh();
+        std::vector<unsigned char> bytes;
+        Gum::Codecs::unzip(modelFile, [&bytes](const char* data, const unsigned int len) {
+            for(unsigned int i = 0; i < len; i++)
+                bytes.push_back(data[i]);
+        });
+        
+        SerializationData ndata(bytes.data(), bytes.size());
+        ndata >> *this;
+        Mesh::mLoadedMeshes[modelFile.toString()] = pMesh;
+    }
+    else
+    {
+        pMesh = new Mesh();
+        pMesh->name = modelFile.getName();
+        Scene3DLoader loader;
+        loader.iterateMeshes([this](unsigned int currentMesh, unsigned int numMeshes, Mesh* mesh, Bone* rootbone, std::vector<Bone*> bones) {
+            pMesh->addMesh(mesh);
+            Gum::_delete(mesh);
+        });
+        loader.load(modelFile);
+        Mesh::mLoadedMeshes[modelFile.toString()] = pMesh;
+    }
+
+    if(!Gum::Graphics::RUN_HEADLESS)
+	    load();
 }
 
 
@@ -64,7 +101,9 @@ Object3D::Object3D(Mesh *mesh, std::string name) : Object3D()
 	//Create and add Properties
 	sName = name;
 	pMesh = mesh;
-	load();
+
+    if(!Gum::Graphics::RUN_HEADLESS)
+	    load();
 }
 
 Object3D::~Object3D()
@@ -90,10 +129,10 @@ void Object3D::load()
         pVertexArrayObject->bind();
         pVertexVBO = new VertexBufferObject<Vertex>();
 		pVertexVBO->setData(pMesh->getVertexBuffer(), Gum::Graphics::DataState::STATIC);
-        pVertexArrayObject->addAttribute(pVertexVBO, 0, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, position.x));
-        pVertexArrayObject->addAttribute(pVertexVBO, 1, 2, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, textureCoord.x));
-        pVertexArrayObject->addAttribute(pVertexVBO, 2, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, normal.x));
-        pVertexArrayObject->addAttribute(pVertexVBO, 7, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, tangent.x));
+        pVertexArrayObject->addAttribute(pVertexVBO,  0, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, position.x));
+        pVertexArrayObject->addAttribute(pVertexVBO,  1, 2, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, textureCoord.x));
+        pVertexArrayObject->addAttribute(pVertexVBO,  2, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, normal.x));
+        pVertexArrayObject->addAttribute(pVertexVBO,  7, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, tangent.x));
         
         pTransMatricesVBO = new VertexBufferObject<mat4>();
 		//pTransMatricesVBO->setData(vTransforms, GL_STREAM_DRAW);
@@ -109,8 +148,8 @@ void Object3D::load()
             pIndexBuffer = new ElementBufferObject();
             pIndexBuffer->setData(pMesh->getIndexBuffer());
             pVertexArrayObject->addElementBuffer(pIndexBuffer);
-            pVertexArrayObject->unbind();
         }
+        pVertexArrayObject->unbind();
 
         selectRenderFunc();
 	}
@@ -145,7 +184,7 @@ Object3DInstance* Object3D::addInstance(Object3DInstance* instance)
 	vTransforms.push_back(instance->getMatrix());
 	pTransMatricesVBO->setData(vTransforms, Gum::Graphics::DataState::DYNAMIC);
     
-	vIndividualColors.push_back(instance->getIndividualColor());
+	vIndividualColors.push_back(instance->getIndividualColor().getGLColor());
 	pIndividualColorsVBO->setData(vIndividualColors, Gum::Graphics::DataState::STATIC);
 
     if(pAddInstanceCallback != nullptr)
@@ -203,6 +242,28 @@ void Object3D::selectRenderFunc()
     }
 }
 
+void Object3D::saveToFile(const Gum::Filesystem::File& file)
+{
+    if(file.getType() != Gum::Filesystem::Filetype::FILE)
+    {
+        Gum::Output::error("Object3D: cannot save to file: " + file.toString() + " is not a file!");
+        return;
+    }
+
+    std::stringstream stream;
+
+    SerializationData data;
+    data << *this;
+    unsigned int len = 0;
+    unsigned char* bytes = data.getData(len);
+    for(unsigned int i = 0; i < len; i++)
+        stream << bytes[i];
+
+    Gum::Codecs::zip(file, 7, stream);
+}
+
+
+
 //
 //Setter
 //
@@ -221,3 +282,12 @@ Object3DInstance* 	Object3D::getInstance(int index)   { return vInstances[index]
 ShaderProgram*		Object3D::getShaderProgram()	   { return pShader; }
 unsigned int        Object3D::numInstances() 	       { return vInstances.size(); }
 VertexArrayObject*  Object3D::getVertexArrayObject()   { return pVertexArrayObject; }
+
+
+SerializationData& Object3D::serialize(SerializationData& data)
+{
+    if(pMesh == nullptr)
+        return data;
+
+    return data & *pMesh;
+}

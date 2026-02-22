@@ -20,7 +20,7 @@ public:
     
     void repeat(bool mirrored = false);
     void clampToEdge(bool border = false);
-    void setFiltering(Texture::FilteringTypes filteringtype);
+    void setFiltering(Texture::FilteringType filteringtype);
     void updateImage(const ivec2& size, const int& numchannels, const void* data, uint16_t datatype);
 
 

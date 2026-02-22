@@ -1,44 +1,54 @@
 #pragma once
 #include "Texture.h"
-#include "Variables.h"
+#include "TextureImageData.h"
+#include <functional>
+#include <System/File.h>
 
-class Texture2D : public Texture
+typedef std::function<color(ivec2 pixelcoord)> Texture2DGeneratorFunc;
+
+template<typename T>
+class tTexture2D : public Texture, public TextureImageData<T, 1>
 {
 protected:
-	const unsigned int MAX_PIXEL_COLOR = 256 * 256 * 256;
+    static inline unsigned int iSerializeQuality = 85;
 	ivec2 v2Size;
-    unsigned int iChannels;
-    void* vPixelData;
-
 
 public:
-	Texture2D(std::string name = "unknown", uint16_t datatype = Gum::Graphics::Datatypes::UNSIGNED_CHAR);
-	virtual ~Texture2D();
+	tTexture2D(std::string name = "unknown");
+	tTexture2D(const std::string& name, const ivec2& size, Texture2DGeneratorFunc generator);
+	virtual ~tTexture2D();
 
-    void updateImage();
-	void load(std::string TexFilepath, bool wait);
+    void updateImage() override;
+	void load(const Gum::File& filepath, bool wait);
 	void loadFromMemory(unsigned char* pixels, size_t size);
-	void bind(const int& index = 0);
-	void unbind(const int& index = 0);
+	void generate(Texture2DGeneratorFunc function);
+	void bind(const int& index = 0) override;
+	void unbind(const int& index = 0) override;
 	static void unbindGlobal(const int& index = 0);
 
     float getHeightMapPixel(int x, int y);
     void initEmpty();
     
-    void repeat(bool mirrored = false);
-    void clampToEdge(bool border = false);
-    void setFiltering(FilteringTypes filteringtype);
+    void repeat(bool mirrored = false) override;
+    void clampToEdge(bool border = false) override;
+    void setFiltering(FilteringType filteringtype) override;
 
 
     //Setter
+    void setData(T* data);
     void setSize(const ivec2& size);
-    void setData(void* data);
     void setPixel(const int& x, const int& y, const color& col);
-    void setNumChannels(const int& channels);
+    static void setSerializeQuality(const unsigned int& quality);
 
     //Getter
     ivec2 getSize() const;
-    const void* getPixelPtr();
-    vec4 getPixel(int x, int y) const;
-    int numChannels() const;
+    color getPixel(int x, int y) const;
+
+    SerializationData& serialize(SerializationData& data) override;
 };
+
+template class tTexture2D<unsigned char>;
+template class tTexture2D<float>;
+
+typedef tTexture2D<unsigned char> Texture2D;
+typedef tTexture2D<float> Texture2Df;

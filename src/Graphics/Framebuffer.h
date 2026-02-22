@@ -1,7 +1,8 @@
 #pragma once
 #include <gum-maths.h>
 #include "Maths/bbox.h"
-#include "TextureDepth.h"
+#include "TextureDepth2D.h"
+#include "TextureDepth3D.h"
 #include "TextureCube.h"
 #include "Texture2D.h"
 #include <unordered_map>
@@ -39,14 +40,14 @@ private:
 
     std::unordered_map<uint8_t, Texture*> mTextureAttachments;
     std::vector<unsigned int> vDrawBuffers;
-    TextureDepth* pDepthTexture;
+    Texture* pDepthTexture;
     mat4 m4ScreenMatrix;
     float fAspectRatio, fAspectRatioWidthToHeight;
 
     void createNative();
     void destroyNative();
 
-    void checkStatus();
+    void checkStatus(std::string funcname);
     void updateMatrix();
     void resizeTextures();
 
@@ -62,11 +63,12 @@ public:
     void resetViewport();
     void clear(const unsigned short& flags);
 
-    Texture2D* addTextureAttachment(unsigned int index = 0, std::string name = "framebufferTexture", uint16_t datatype = Gum::Graphics::Datatypes::UNSIGNED_CHAR, uint16_t numChannels = 4);
-    TextureCube* addCubeTextureAttachment(unsigned int index = 0, std::string name = "framebufferCubeTexture", uint16_t format = Texture::Pixelformat::RGBA, uint16_t internalFormat = Texture::Pixelformat::RGBA, int datatype = Gum::Graphics::Datatypes::UNSIGNED_CHAR);
-    TextureCube* addCubeTextureAttachment(unsigned int index, TextureCube* texture);
-    TextureDepth* addDepthTextureAttachment(std::string name = "framebufferDepthTexture");
-    TextureDepth* addDepthStencilTextureAttachment(std::string name = "framebufferDepthStencilTexture");
+    template<typename T> tTexture2D<T>* addTextureAttachment(unsigned int index = 0, std::string name = "framebufferTexture", uint16_t numChannels = 4);
+    template<typename T> tTextureCube<T>* addCubeTextureAttachment(unsigned int index = 0, std::string name = "framebufferCubeTexture", uint16_t format = Gum::Graphics::Pixelformat::RGBA, uint16_t internalFormat = Gum::Graphics::Pixelformat::RGBA);
+    template<typename T> tTextureCube<T>* addCubeTextureAttachment(unsigned int index, tTextureCube<T>* texture);
+    Texture* addDepthTextureAttachment(std::string name = "framebufferDepthTexture");
+    Texture* addDepthTextureArrayAttachment(const unsigned int& numlayers, std::string name = "framebufferDepthTextureArray");
+    Texture* addDepthStencilTextureAttachment(std::string name = "framebufferDepthStencilTexture");
     void addDepthAttachment();
     
     void attachTexture(const int& index, Texture* texture, const unsigned short& target, const unsigned int& mipmaplevel = 0U);
@@ -75,7 +77,7 @@ public:
 
     //Setter
     void setDepthAttachment(unsigned int attachment);
-    void setDepthTextureAttachment(TextureDepth* depthMap);
+    void setDepthTextureAttachment(Texture* depthMap);
     void setOffset(ivec2 offset);
     void setSize(ivec2 size);
     void setClearColor(color clearcolor);
@@ -84,7 +86,7 @@ public:
 
     //Getter
     Texture* getTextureAttachment(int index = 0);
-    TextureDepth* getDepthTextureAttachment();
+    Texture* getDepthTextureAttachment();
     int getDepthAttachmentID();
     int numTextureAttachments();
     ivec2 getSize();

@@ -12,12 +12,12 @@ protected:
 
     void generateBoundingBox();
 	void generateFurthestAwayPoint();
-    
 
 public:
     Object3DInstance(Object3D* obj);
     virtual ~Object3DInstance() {};
 
+    virtual void update() {};
     void updateMatrix() override;
     virtual void onTransformUpdate() override {};
 };

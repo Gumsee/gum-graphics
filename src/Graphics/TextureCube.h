@@ -1,20 +1,19 @@
 #pragma once
 #include "Texture2D.h"
-#include <cstdint>
+#include "TextureImageData.h"
 
-class TextureCube : public Texture
+template<typename T>
+class tTextureCube : public Texture, public TextureImageData<T, 6>
 {
+private:
+    using Data = TextureImageData<T, 6>;
+    
 protected:
-	const int MAX_PIXEL_COLOR = 256 * 256 * 256;
 	ivec2 v2Size[6];
-    void* vPixelData[6];
-	int iChannels[6];
-	bool bNeedsFreeing[6];
-
 
 public:
-	TextureCube(std::string name = "unknown", uint16_t datatype = Gum::Graphics::Datatypes::UNSIGNED_CHAR);
-	~TextureCube();
+	tTextureCube(std::string name = "unknown");
+	~tTextureCube();
 
 	void bind(const int& index = 0);
 	void unbind(const int& index = 0);
@@ -22,13 +21,19 @@ public:
     
     void repeat(bool mirrored = false);
     void clampToEdge(bool border = false);
-    void setFiltering(FilteringTypes filteringtype);
+    void setFiltering(FilteringType filteringtype);
 	
     void updateImage();
     void updateImage(int side);
 	void load(std::vector<std::string> texturepaths, bool wait);
 	
-    void setData(unsigned char* data, const unsigned int& side);
+    void setData(T* data, const unsigned int& side);
     void setSize(ivec2 size, int side);
     void setSize(ivec2 size);
 };
+
+template class tTextureCube<unsigned char>;
+template class tTextureCube<float>;
+
+typedef tTextureCube<unsigned char> TextureCube;
+typedef tTextureCube<float> TextureCubef;

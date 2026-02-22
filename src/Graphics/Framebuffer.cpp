@@ -1,9 +1,6 @@
 #include "Framebuffer.h"
 #include <System/MemoryManagement.h>
-#include "TextureDepth.h"
-#include "TextureHDR.h"
 #include "WrapperFunctions.h"
-#include <algorithm>
 
 Framebuffer::Framebuffer(const ivec2& size, bool iswindow)
 {
@@ -59,7 +56,7 @@ void Framebuffer::setRenderArea(const bbox2i& area)     { this->bbRenderArea = a
 // Getter
 //
 Texture* Framebuffer::getTextureAttachment(int index)   { return this->mTextureAttachments[index]; }
-TextureDepth* Framebuffer::getDepthTextureAttachment()  { return this->pDepthTexture; }
+Texture* Framebuffer::getDepthTextureAttachment()       { return this->pDepthTexture; }
 int Framebuffer::getDepthAttachmentID()                 { return this->iDepthBufferID; }
 int Framebuffer::numTextureAttachments()                { return this->mTextureAttachments.size(); }
 ivec2 Framebuffer::getSize()                            { return this->v2Size; }

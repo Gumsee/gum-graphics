@@ -1,19 +1,15 @@
 #include "Texture.h"
-#include "WrapperFunctions.h"
-#include <iostream>
 
-
-Texture::Texture(Types type, uint16_t datatype)
+Texture::Texture(std::string name, Type type)
 {
+    this->sName = name;
     this->iType = type;
-    this->iDatatype = datatype;
 	this->bLoaded = false;
-	this->bNeedsFreeing = false;
 	this->bIsGrayscale = false;
+    this->bHasTransparency = true;
     this->bIsMipmapped = false;
 	this->iTextureID = 0;
     this->iCurrentMipmapLevel = 0;
-	this->sName = "EmptyTexture";
     createNative();
 }
 
@@ -46,14 +42,22 @@ void Texture::setID(const int& id) 				                { this->iTextureID = id; 
 void Texture::markLoaded()                                      { this->bLoaded = true; }
 void Texture::setGrayscale(const bool& isgrayscale)             { this->bIsGrayscale = isgrayscale; }
 void Texture::setActiveMipmapLevel(const unsigned short& level) { this->iCurrentMipmapLevel = level; }
+void Texture::setTransparency(const bool& hastransparency)      { this->bHasTransparency = hastransparency; }
 
 
 //
 // Getter
 //
-unsigned int Texture::getID() const				    { return this->iTextureID; }
-Texture::Types Texture::getType() const 			{ return this->iType; }
-uint16_t Texture::getDatatype() const               { return this->iDatatype; }
-bool Texture::isLoaded() const 					    { return this->bLoaded; }
-std::string Texture::getName() const			    { return this->sName; }
-bool Texture::isGrayscale() const                   { return this->bIsGrayscale; }
+unsigned int Texture::getID() const    { return this->iTextureID; }
+Texture::Type Texture::getType() const { return static_cast<Type>(this->iType); }
+bool Texture::isLoaded() const 		   { return this->bLoaded; }
+std::string Texture::getName() const   { return this->sName; }
+bool Texture::isGrayscale() const      { return this->bIsGrayscale; }
+bool Texture::hasTransparency() const  { return this->bHasTransparency; }
+
+
+SerializationData& Texture::serialize(SerializationData& data)
+{
+    data & sName;
+    return data;
+}
