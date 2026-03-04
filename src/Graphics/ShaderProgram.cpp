@@ -112,11 +112,20 @@ void ShaderProgram::setCurrentlyBoundShader(ShaderProgram* program) { pCurrently
 //
 // Getter
 //
-std::string ShaderProgram::getName() const           				{ return this->sName; }
-unsigned int ShaderProgram::getProgramID() const           			{ return this->iProgramID; }
-Shader* ShaderProgram::getShader(int index) 						{ return this->vShaders[index]; }
-bool ShaderProgram::isInternal()                                    { return this->bIsInternal; }
-ShaderProgram* ShaderProgram::getCurrentlyBoundShader() 			{ return pCurrentlyBoundShaderProgram; }
-ShaderProgram* ShaderProgram::getShaderProgramByName(const std::string& name) { return mShaderPrograms[name]; }
-unsigned int ShaderProgram::numShaderPrograms()                     { return mShaderPrograms.size(); }
+std::string ShaderProgram::getName() const           				                        { return this->sName; }
+unsigned int ShaderProgram::getProgramID() const           			                    { return this->iProgramID; }
+Shader* ShaderProgram::getShader(int index) 						                            { return this->vShaders[index]; }
+bool ShaderProgram::isInternal()                                                    { return this->bIsInternal; }
+ShaderProgram* ShaderProgram::getCurrentlyBoundShader() 			                      { return pCurrentlyBoundShaderProgram; }
+ShaderProgram* ShaderProgram::getShaderProgramByName(const std::string& name)       { return mShaderPrograms[name]; }
+unsigned int ShaderProgram::numShaderPrograms()                                     { return mShaderPrograms.size(); }
 std::unordered_map<std::string, ShaderProgram*>& ShaderProgram::getShaderPrograms() { return mShaderPrograms; }
+
+
+void ShaderProgram::destroyAllShaders()
+{
+  for(auto shaderprogram : mShaderPrograms)
+  {
+    Gum::_delete(shaderprogram.second);
+  }
+}

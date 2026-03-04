@@ -52,11 +52,12 @@ private:
     void resizeTextures();
 
 public:
-    Framebuffer(const ivec2& size, bool iswindow = false);
+    Framebuffer(const ivec2& size, bool iswindow = false, const unsigned int id = 0);
     ~Framebuffer();
 
     inline static Framebuffer* CurrentlyBoundFramebuffer = nullptr;
     inline static Framebuffer* WindowFramebuffer = nullptr;
+    inline static unsigned int DefaultFramebufferID = 0;
 
     void bind();
     static void unbind(const ivec2& viewportsize = ivec2(0,0));
@@ -82,6 +83,7 @@ public:
     void setSize(ivec2 size);
     void setClearColor(color clearcolor);
     void setRenderArea(const bbox2i& area);
+    void overrideID(unsigned int id);
 
 
     //Getter
@@ -97,6 +99,7 @@ public:
     float getAspectRatioWidthToHeight();
     color getPixel(ivec2 pos);
     vec2 getPixelSize() const;
+    bool readPixelData(void* image, ivec2 position, ivec2 size, unsigned int pixelformat = Gum::Graphics::Pixelformat::RGBA, unsigned int datatype = Gum::Graphics::Datatypes::UNSIGNED_CHAR);
     color getClearColor() const;
     bbox2i getRenderArea() const;
 };

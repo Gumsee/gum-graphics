@@ -21,8 +21,8 @@ private:
 	std::string sName;
 	void compileShaders();
 	void linkShaders();
-    void createNative();
-    void destroyNative();
+  void createNative();
+  void destroyNative();
 	void addUniform(const std::string& Name);
 	void addUniform(const std::string& Name, const int& size);
 
@@ -82,6 +82,8 @@ public:
         if(current != nullptr)
             current->use();
     }
+
+  static void destroyAllShaders();
 
 
 	//Setter

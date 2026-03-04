@@ -20,10 +20,10 @@ private:
     static RenderFunc pRenderStripFunc, pRenderTessellatedStripFunc, pRenderIndexedFunc, pRenderTessellatedIndexedFunc;
 
 protected:
-	Object3D();
+	Object3D(bool initvao);
 
 	ShaderProgram *pShader;
-	VertexArrayObject* pVertexArrayObject;
+	VertexArrayObject* pVertexArrayObject = nullptr;
     ElementBufferObject* pIndexBuffer;
     VertexBufferObject<mat4>* pTransMatricesVBO;
     VertexBufferObject<Vertex>* pVertexVBO;
@@ -74,7 +74,7 @@ public:
     //Getter
 	std::string getName();
     Mesh* getMesh();
-	Object3DInstance* getInstance(int index = 0);
+	Object3DInstance* getInstance(const unsigned int& index = 0);
 	ShaderProgram* getShaderProgram();
 	unsigned int numInstances();
     VertexArrayObject* getVertexArrayObject();

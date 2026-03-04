@@ -61,7 +61,7 @@ public:
 	int getTextureMultiplier();
 	std::string getName();
 	color getColor();
-	Texture* getTexture(int index);
+	Texture* getTexture(unsigned int index);
 	int numTextures();
 
 	void setName(std::string name);
@@ -73,8 +73,8 @@ public:
 	void setTextureMultiplier(float texMultiplier);
 	void setIsTransparency(bool isTransparent);
 	void flipNormals(bool shouldFlip = true);
-	void setTexture(Texture *tex, int index);
-	void delTexture(int index);
+	void setTexture(Texture *tex, unsigned int index);
+	void delTexture(unsigned int index);
 	void bindTextures();
 	void unbindTextures();
 

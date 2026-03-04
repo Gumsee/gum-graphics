@@ -22,12 +22,12 @@ Object3D::RenderFunc Object3D::pRenderTessellatedIndexedFunc = [](Object3D* obj)
     obj->pVertexArrayObject->renderTesselatedIndexed(obj->vInstances.size());
 };
 
-Object3D::Object3D()
+Object3D::Object3D(bool initvao)
 {
 	this->pShader = nullptr;
     this->pIndexBuffer = nullptr;
 
-    if(!Gum::Graphics::RUN_HEADLESS)
+    if(!Gum::Graphics::RUN_HEADLESS && initvao)
     {
         pVertexArrayObject = new VertexArrayObject(VertexArrayObject::PrimitiveTypes::TRIANGLES);
         pVertexArrayObject->onRenderCountUpdate([this]() {
@@ -41,7 +41,7 @@ Object3D::Object3D()
  *  @param[in] Shader Shader used to render object
  *  @param[in] name Identifier, also used in the objectmanager in most cases
  */
-Object3D::Object3D(const Gum::File& modelFile, const std::string& name) : Object3D()
+Object3D::Object3D(const Gum::File& modelFile, const std::string& name) : Object3D(true)
 {
     if(modelFile.getType() != Gum::Filesystem::Filetype::FILE)
     {
@@ -86,8 +86,7 @@ Object3D::Object3D(const Gum::File& modelFile, const std::string& name) : Object
         Mesh::mLoadedMeshes[modelFile.toString()] = pMesh;
     }
 
-    if(!Gum::Graphics::RUN_HEADLESS)
-	    load();
+    load();
 }
 
 
@@ -96,14 +95,13 @@ Object3D::Object3D(const Gum::File& modelFile, const std::string& name) : Object
  *  @param[in] Shader Shader used to render object
  *  @param[in] name Identifier, also used in the objectmanager in most cases
  */
-Object3D::Object3D(Mesh *mesh, std::string name) : Object3D()
+Object3D::Object3D(Mesh *mesh, std::string name) : Object3D(true)
 {
 	//Create and add Properties
 	sName = name;
 	pMesh = mesh;
 
-    if(!Gum::Graphics::RUN_HEADLESS)
-	    load();
+  load();
 }
 
 Object3D::~Object3D()
@@ -123,35 +121,46 @@ Object3D::~Object3D()
  */ 
 void Object3D::load()
 {
+    if(Gum::Graphics::RUN_HEADLESS)
+      return;
+
+    if(pVertexArrayObject == nullptr)
+    {
+        pVertexArrayObject = new VertexArrayObject(VertexArrayObject::PrimitiveTypes::TRIANGLES);
+        pVertexArrayObject->onRenderCountUpdate([this]() {
+            selectRenderFunc();
+        });
+    }
+
 	if(pMesh != nullptr)
 	{
-		//Binding
-        pVertexArrayObject->bind();
-        pVertexVBO = new VertexBufferObject<Vertex>();
-		pVertexVBO->setData(pMesh->getVertexBuffer(), Gum::Graphics::DataState::STATIC);
-        pVertexArrayObject->addAttribute(pVertexVBO,  0, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, position.x));
-        pVertexArrayObject->addAttribute(pVertexVBO,  1, 2, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, textureCoord.x));
-        pVertexArrayObject->addAttribute(pVertexVBO,  2, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, normal.x));
-        pVertexArrayObject->addAttribute(pVertexVBO,  7, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, tangent.x));
+		  //Binding
+      pVertexArrayObject->bind();
+      pVertexVBO = new VertexBufferObject<Vertex>();
+		  pVertexVBO->setData(pMesh->getVertexBuffer(), Gum::Graphics::DataState::STATIC);
+      pVertexArrayObject->addAttribute(pVertexVBO,  0, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, position.x));
+      pVertexArrayObject->addAttribute(pVertexVBO,  1, 2, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, textureCoord.x));
+      pVertexArrayObject->addAttribute(pVertexVBO,  2, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, normal.x));
+      pVertexArrayObject->addAttribute(pVertexVBO,  7, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, tangent.x));
         
-        pTransMatricesVBO = new VertexBufferObject<mat4>();
-		//pTransMatricesVBO->setData(vTransforms, GL_STREAM_DRAW);
-		pVertexArrayObject->addAttributeMat4(pTransMatricesVBO, 3, Gum::Graphics::Datatypes::FLOAT, 1);
+      pTransMatricesVBO = new VertexBufferObject<mat4>();
+      //pTransMatricesVBO->setData(vTransforms, GL_STREAM_DRAW);
+      pVertexArrayObject->addAttributeMat4(pTransMatricesVBO, 3, Gum::Graphics::Datatypes::FLOAT, 1);
 
-		pIndividualColorsVBO = new VertexBufferObject<vec4>();
-		pVertexArrayObject->addAttribute(pIndividualColorsVBO, 10, 4, Gum::Graphics::Datatypes::FLOAT, sizeof(vec4), 0, 1);
+      pIndividualColorsVBO = new VertexBufferObject<vec4>();
+      pVertexArrayObject->addAttribute(pIndividualColorsVBO, 10, 4, Gum::Graphics::Datatypes::FLOAT, sizeof(vec4), 0, 1);
 
-        pVertexArrayObject->setVertexCount(pVertexVBO->getLength());
+      pVertexArrayObject->setVertexCount(pVertexVBO->getLength());
 
-        if(pMesh->getIndexBuffer().size() > 0)
-        {
-            pIndexBuffer = new ElementBufferObject();
-            pIndexBuffer->setData(pMesh->getIndexBuffer());
-            pVertexArrayObject->addElementBuffer(pIndexBuffer);
-        }
-        pVertexArrayObject->unbind();
+      if(pMesh->getIndexBuffer().size() > 0)
+      {
+          pIndexBuffer = new ElementBufferObject();
+          pIndexBuffer->setData(pMesh->getIndexBuffer());
+          pVertexArrayObject->addElementBuffer(pIndexBuffer);
+      }
+      pVertexArrayObject->unbind();
 
-        selectRenderFunc();
+      selectRenderFunc();
 	}
 	else
 	{
@@ -276,12 +285,12 @@ void Object3D::onAddInstance(AddInstanceCallback callback) { this->pAddInstanceC
 //
 //Getter
 //
-Mesh*               Object3D::getMesh()                { return pMesh; }
-std::string 		Object3D::getName() 			   { return sName; }
-Object3DInstance* 	Object3D::getInstance(int index)   { return vInstances[index]; }
-ShaderProgram*		Object3D::getShaderProgram()	   { return pShader; }
-unsigned int        Object3D::numInstances() 	       { return vInstances.size(); }
-VertexArrayObject*  Object3D::getVertexArrayObject()   { return pVertexArrayObject; }
+Mesh*               Object3D::getMesh()                              { return pMesh; }
+std::string 		Object3D::getName() 			                 { return sName; }
+Object3DInstance* 	Object3D::getInstance(const unsigned int& index) { return vInstances[(size_t)index]; }
+ShaderProgram*		Object3D::getShaderProgram()	                 { return pShader; }
+unsigned int        Object3D::numInstances() 	                     { return vInstances.size(); }
+VertexArrayObject*  Object3D::getVertexArrayObject()                 { return pVertexArrayObject; }
 
 
 SerializationData& Object3D::serialize(SerializationData& data)

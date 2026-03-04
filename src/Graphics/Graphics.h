@@ -1,5 +1,7 @@
 #pragma once
+#ifdef GUMDESKTOP_FOUND
 #include <Desktop/Window.h>
+#endif
 #include <string>
 #include "Framebuffer.h"
 #include "System/MemoryManagement.h"
@@ -13,6 +15,7 @@ namespace Graphics
     extern void renderWireframe(const bool wireframe);
     extern void cullBackside(const bool cullback);
 
+    #ifdef GUMDESKTOP_FOUND
     static void __attribute__ ((unused)) addFramebufferToWindow(Gum::Window* window)
     {
         Framebuffer* framebuffer = new Framebuffer(window->getSize(), true);
@@ -37,4 +40,5 @@ namespace Graphics
             };
         });
     }
+    #endif
 }}

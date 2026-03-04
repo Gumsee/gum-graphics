@@ -31,11 +31,6 @@ tTexture2D<T>::tTexture2D(const std::string& name, const ivec2& size, Texture2DG
 }
 
 template<typename T>
-tTexture2D<T>::~tTexture2D()
-{
-}
-
-template<typename T>
 float tTexture2D<T>::getHeightMapPixel(int x, int y)
 {
     color pixel = getPixel(x, y);
@@ -48,6 +43,14 @@ float tTexture2D<T>::getHeightMapPixel(int x, int y)
 template<typename T>
 void tTexture2D<T>::load(const Gum::File& filepath, bool wait)
 { 
+  if(Tools::mapHasKeyNotNull(mLoadedTextures, filepath.toString())) 
+  {
+      this->iTextureID = mLoadedTextures[filepath.toString()]->getID();
+      return;
+  }
+  mLoadedTextures[filepath.toString()] = this;
+
+  Gum::Output::print("Loading texture: " + filepath.toString());
     std::thread loadThread([filepath, this] {
         std::lock_guard<decltype(this->loadMutex)> lock(this->loadMutex);
 

@@ -1,14 +1,17 @@
 #include "Texture.h"
+#include <Essentials/Tools.h>
+#include "Texture2D.h"
+#include "TextureHDR.h"
 
 Texture::Texture(std::string name, Type type)
 {
     this->sName = name;
     this->iType = type;
-	this->bLoaded = false;
-	this->bIsGrayscale = false;
+    this->bLoaded = false;
+    this->bIsGrayscale = false;
     this->bHasTransparency = true;
     this->bIsMipmapped = false;
-	this->iTextureID = 0;
+	  this->iTextureID = 0;
     this->iCurrentMipmapLevel = 0;
     createNative();
 }
@@ -18,12 +21,41 @@ Texture::~Texture()
     destroyNative();
 }
 
-void Texture::loadTextures()
+Texture* Texture::autoLoad(Gum::File filepath, bool waitForLoading)
+{
+    std::string name = filepath.toString();
+    if(name.empty())
+      return nullptr;
+		std::string extension = "";
+    if(name.length() > 3)
+      Tools::toUpperCase(name.substr(name.length() - 3, 3));
+		if(extension == "HDR")
+		{
+			TextureHDR *tex = new TextureHDR(name);
+			tex->load(name, waitForLoading);
+			return tex;
+		}
+		else
+		{
+			Texture2D *tex = new Texture2D(name);
+			tex->load(name, waitForLoading);
+			return tex;
+		}
+}
+
+void Texture::updateBackgroundLoading()
 {
     std::lock_guard<decltype(loadMutex)> lock(loadMutex);
     for(Texture* tex : vToLoadTextures)
         tex->updateImage();
     vToLoadTextures.clear();
+}
+
+void Texture::cleanupAllLoadedTextures()
+{
+  for(auto tex : mLoadedTextures)
+    Gum::_delete(tex.second);
+  mLoadedTextures.clear();
 }
 
 void Texture::createMipmaps()

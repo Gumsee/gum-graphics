@@ -51,7 +51,7 @@ public:
     {
         bind();
         Gum::Graphics::VertexBufferObject::setDataNative(iSizeOfType, data.data(), data.size(), usage);
-        iLength = data.size();
+        iLength = (unsigned int)data.size();
         unbind();
     }
 

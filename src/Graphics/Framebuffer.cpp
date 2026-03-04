@@ -2,11 +2,11 @@
 #include <System/MemoryManagement.h>
 #include "WrapperFunctions.h"
 
-Framebuffer::Framebuffer(const ivec2& size, bool iswindow)
+Framebuffer::Framebuffer(const ivec2& size, bool iswindow, const unsigned int id)
+  : v2Size(size),
+    iID(id)
 {
     this->v2Offset = ivec2(0,0);
-    this->v2Size = size;
-    this->iID = 0;
     this->iDepthBufferID = 0;
     this->pDepthTexture = nullptr;
     this->bbRenderArea = bbox2i(ivec2(0,0), size);
@@ -50,6 +50,7 @@ void Framebuffer::setOffset(ivec2 offset)               { this->v2Offset = offse
 void Framebuffer::setSize(ivec2 size)                   { this->v2Size = size; updateMatrix(); resizeTextures(); }
 void Framebuffer::setClearColor(color clearcolor)       { this->cClearColor = clearcolor; }
 void Framebuffer::setRenderArea(const bbox2i& area)     { this->bbRenderArea = area; gumScissor(area); }
+void Framebuffer::overrideID(unsigned int id)           { this->iID = id; }
 
 
 //

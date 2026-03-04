@@ -16,7 +16,7 @@ protected:
 public:
 	tTexture2D(std::string name = "unknown");
 	tTexture2D(const std::string& name, const ivec2& size, Texture2DGeneratorFunc generator);
-	virtual ~tTexture2D();
+	virtual ~tTexture2D() override;
 
     void updateImage() override;
 	void load(const Gum::File& filepath, bool wait);

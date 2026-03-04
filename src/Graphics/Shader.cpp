@@ -57,6 +57,8 @@ std::string Shader::getShaderTypeStr()
     else if(iType == TYPES::TESSELLATION_CONTROL_SHADER)    return "Tessellation Control Shader";
     else if(iType == TYPES::TESSELLATION_EVALUATION_SHADER) return "Tessellation Evaluation Shader";
     else if(iType == TYPES::GEOMETRY_SHADER)                return "Geometry Shader";
+
+    return "Unknown Shader";
 }
 
 
