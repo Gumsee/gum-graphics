@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0...3.9)
+cmake_minimum_required (VERSION 4.0)
 project(GumGraphics)
 cmake_policy(SET CMP0072 NEW)
 cmake_policy(SET CMP0090 NEW)
@@ -81,7 +81,7 @@ message(STATUS "${PROJECT_NAME}: CXXFLAGS: ${CMAKE_CXX_FLAGS}")
         endif() 
     
         if(NOT GUMDESKTOP_FOUND) 
-            find_package(GumDesktop REQUIRED)
+            find_package(GumDesktop)
         endif() 
     
         if(NOT GUMSYSTEM_FOUND) 

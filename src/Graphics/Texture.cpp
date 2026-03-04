@@ -26,19 +26,30 @@ Texture* Texture::autoLoad(Gum::File filepath, bool waitForLoading)
     std::string name = filepath.toString();
     if(name.empty())
       return nullptr;
+
+    Gum::Output::print("Loading texture: " + filepath.toString());
+    if(Tools::mapHasKeyNotNull(mLoadedTextures, name)) 
+      Gum::Output::print("  already loaded texture: " + filepath.toString());
+      
+    if(Tools::mapHasKeyNotNull(mLoadedTextures, name)) 
+        return mLoadedTextures[name];
+
+
 		std::string extension = "";
     if(name.length() > 3)
-      Tools::toUpperCase(name.substr(name.length() - 3, 3));
+      extension = Tools::toUpperCase(name.substr(name.length() - 3, 3));
 		if(extension == "HDR")
 		{
 			TextureHDR *tex = new TextureHDR(name);
 			tex->load(name, waitForLoading);
+      mLoadedTextures[filepath.toString()] = tex;
 			return tex;
 		}
 		else
 		{
 			Texture2D *tex = new Texture2D(name);
 			tex->load(name, waitForLoading);
+      mLoadedTextures[filepath.toString()] = tex;
 			return tex;
 		}
 }

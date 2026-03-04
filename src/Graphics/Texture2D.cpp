@@ -42,16 +42,8 @@ float tTexture2D<T>::getHeightMapPixel(int x, int y)
 
 template<typename T>
 void tTexture2D<T>::load(const Gum::File& filepath, bool wait)
-{ 
-  if(Tools::mapHasKeyNotNull(mLoadedTextures, filepath.toString())) 
-  {
-      this->iTextureID = mLoadedTextures[filepath.toString()]->getID();
-      return;
-  }
-  mLoadedTextures[filepath.toString()] = this;
-
-  Gum::Output::print("Loading texture: " + filepath.toString());
-    std::thread loadThread([filepath, this] {
+{
+      std::thread loadThread([filepath, this] {
         std::lock_guard<decltype(this->loadMutex)> lock(this->loadMutex);
 
         ImageData imageData = TextureLoader::loadImage(filepath);

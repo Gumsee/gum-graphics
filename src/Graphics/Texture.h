@@ -41,7 +41,7 @@ protected:
     inline static std::mutex loadMutex;
 
     unsigned int iTextureID;
-    unsigned int iType;
+    Type iType;
     std::string sName;
     bool bLoaded;
     bool bIsGrayscale;
