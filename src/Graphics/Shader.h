@@ -3,10 +3,9 @@
 #include <string>
 #include <vector>
 
-#define GUM_SHADER_VERSION_STR "#version 450 core \n"
-//#define GUM_SHADER_VERSION_STR "#version 330 core \n"
+#define GUM_SHADER_VERSION_STR "SHADER_VERSION_STRING"
 #define _GLSL(str) #str
-#define GLSL(str) GUM_SHADER_VERSION_STR _GLSL(str)
+#define GLSL(str) GUM_SHADER_VERSION_STR "\n\n" _GLSL(str)
 
 class Shader
 {
