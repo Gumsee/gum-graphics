@@ -22,12 +22,12 @@ private:
 protected:
 	Object3D(bool initvao);
 
-	ShaderProgram *pShader;
+	ShaderProgram *pShader = nullptr;
 	VertexArrayObject* pVertexArrayObject = nullptr;
-    ElementBufferObject* pIndexBuffer;
-    VertexBufferObject<mat4>* pTransMatricesVBO;
-    VertexBufferObject<Vertex>* pVertexVBO;
-    VertexBufferObject<vec4>* pIndividualColorsVBO;
+    ElementBufferObject* pIndexBuffer = nullptr;
+    VertexBufferObject<mat4>* pTransMatricesVBO = nullptr;
+    VertexBufferObject<Vertex>* pVertexVBO = nullptr;
+    VertexBufferObject<vec4>* pIndividualColorsVBO = nullptr;
 
 	std::vector<Object3DInstance*> vInstances;
 	std::vector<mat4> vTransforms;

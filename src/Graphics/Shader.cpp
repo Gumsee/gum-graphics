@@ -2,6 +2,7 @@
 #include "System/Output.h"
 #include "Uniform.h"
 #include <Essentials/Tools.h>
+#include <System/MemoryManagement.h>
 
 Shader::Shader(std::string sourcecode, unsigned int shadertype)
 {
@@ -35,11 +36,18 @@ Shader::Shader(std::string sourcecode, unsigned int shadertype)
     }
 
     createNative();
+    
+    if(Tools::mapHasKeyNotNull(mShaders, iShaderID))
+        Gum::Output::error("Shader: shader with id " + std::to_string(iShaderID) + " already exists!");
+    else
+        mShaders[iShaderID] = this;
 }
 
 Shader::~Shader()
 {
     destroyNative();
+    if(Tools::mapHasKey(mShaders, iShaderID))
+        mShaders.erase(iShaderID);
 }
 
 
@@ -66,3 +74,9 @@ std::string Shader::getShaderTypeStr()
 // Setter
 //
 void Shader::setSourceCode(std::string code) { this->sSource = code; }
+
+void Shader::destroyAllShaders()
+{
+    while(mShaders.size() > 0)
+        Gum::_delete(mShaders.begin()->second);
+}

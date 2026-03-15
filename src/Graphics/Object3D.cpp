@@ -62,7 +62,7 @@ Object3D::Object3D(const Gum::File& modelFile, const std::string& name) : Object
     }
     else if(fileExtension == "gumobj")
     {
-        pMesh = new Mesh();
+        pMesh = new Mesh(modelFile.getName());
         std::vector<unsigned char> bytes;
         Gum::Codecs::unzip(modelFile, [&bytes](const char* data, const unsigned int len) {
             for(unsigned int i = 0; i < len; i++)
@@ -75,8 +75,8 @@ Object3D::Object3D(const Gum::File& modelFile, const std::string& name) : Object
     }
     else
     {
-        pMesh = new Mesh();
-        pMesh->name = modelFile.getName();
+        pMesh = new Mesh(modelFile.getName());
+        
         Scene3DLoader loader;
         loader.iterateMeshes([this](unsigned int currentMesh, unsigned int numMeshes, Mesh* mesh, Bone* rootbone, std::vector<Bone*> bones) {
             pMesh->addMesh(mesh);
@@ -134,14 +134,18 @@ void Object3D::load()
 
 	if(pMesh != nullptr)
 	{
-		  //Binding
+        //Binding
       pVertexArrayObject->bind();
       pVertexVBO = new VertexBufferObject<Vertex>();
-		  pVertexVBO->setData(pMesh->getVertexBuffer(), Gum::Graphics::DataState::STATIC);
+      pVertexVBO->setData(pMesh->getVertexBuffer(), Gum::Graphics::DataState::STATIC);
+    
+      #pragma GCC diagnostic push
+      #pragma GCC diagnostic ignored "-Winvalid-offsetof"
       pVertexArrayObject->addAttribute(pVertexVBO,  0, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, position.x));
       pVertexArrayObject->addAttribute(pVertexVBO,  1, 2, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, textureCoord.x));
       pVertexArrayObject->addAttribute(pVertexVBO,  2, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, normal.x));
       pVertexArrayObject->addAttribute(pVertexVBO,  7, 3, Gum::Graphics::Datatypes::FLOAT, sizeof(Vertex), offsetof(Vertex, tangent.x));
+      #pragma GCC diagnostic pop
         
       pTransMatricesVBO = new VertexBufferObject<mat4>();
       //pTransMatricesVBO->setData(vTransforms, GL_STREAM_DRAW);

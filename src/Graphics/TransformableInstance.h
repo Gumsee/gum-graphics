@@ -3,7 +3,7 @@
 #include <Primitives/UniqueID.h>
 
 template<typename T, unsigned int N>
-class TransformableInstance : public Transformable<N>, public UniqueID
+class TransformableInstance : public Transformable<float, N>, public UniqueID
 {
 protected:
     T* pParent = nullptr;

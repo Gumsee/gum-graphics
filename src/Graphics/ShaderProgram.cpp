@@ -4,10 +4,10 @@
 #include <System/Output.h>
 #include <System/MemoryManagement.h>
 
-ShaderProgram::ShaderProgram(const std::string& name, bool internal)  
+ShaderProgram::ShaderProgram(const std::string& name, bool internal)
+  : sName(name),
+    bIsInternal(internal)
 {
-	this->sName = name;
-    this->bIsInternal = internal;
     createNative();
 
     if(Tools::mapHasKeyNotNull(mShaderPrograms, name))
@@ -19,11 +19,10 @@ ShaderProgram::ShaderProgram(const std::string& name, bool internal)
 ShaderProgram::~ShaderProgram() 
 {
     destroyNative();
-	
-	for(size_t i = 0; i < vShaders.size(); i++)
-		Gum::_delete(vShaders[i]);
+    if(Tools::mapHasKey(mShaderPrograms, sName))
+        mShaderPrograms.erase(sName);
 
-	Locations.clear();
+    Locations.clear();
 	vShaders.clear();
 }
 
@@ -55,7 +54,7 @@ void ShaderProgram::addTexture(const std::string& Name, const int& index)
 }
 
 
-void ShaderProgram::addShader(Shader* shader) { this->vShaders.push_back(shader); }
+void ShaderProgram::addShader(Shader* shader) { if(shader != nullptr) this->vShaders.push_back(shader); }
 void ShaderProgram::removeShader(int index)   { this->vShaders.erase(vShaders.begin() + index); }
 
 void ShaderProgram::build(std::map<const char*, unsigned int> attributes)
@@ -124,8 +123,8 @@ std::unordered_map<std::string, ShaderProgram*>& ShaderProgram::getShaderProgram
 
 void ShaderProgram::destroyAllShaders()
 {
-  for(auto shaderprogram : mShaderPrograms)
-  {
-    Gum::_delete(shaderprogram.second);
-  }
+    while(mShaderPrograms.size() > 0)
+        Gum::_delete(mShaderPrograms.begin()->second);
+
+    Shader::destroyAllShaders();
 }

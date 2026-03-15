@@ -22,10 +22,12 @@ public:
 private:
     std::string sSource;
     std::string sTypeName;
-    unsigned int iType;
-    unsigned int iShaderID;
+    unsigned int iType = 0;
+    unsigned int iShaderID = 0;
     bool bIsCompiled = false;
     std::vector<Uniform> vUniforms;
+
+    static inline std::unordered_map<unsigned int, Shader*> mShaders;
 
     void createNative();
     void destroyNative();
@@ -45,4 +47,6 @@ public:
 
     //Setter
     void setSourceCode(std::string code);
+    
+    static void destroyAllShaders();
 };

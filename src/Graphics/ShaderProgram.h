@@ -17,12 +17,12 @@ private:
 	std::unordered_map<std::string, int> Attributes;
     bool bIsInternal;
 
-	unsigned int iProgramID;
+	unsigned int iProgramID = 0;
 	std::string sName;
 	void compileShaders();
 	void linkShaders();
-  void createNative();
-  void destroyNative();
+	void createNative();
+	void destroyNative();
 	void addUniform(const std::string& Name);
 	void addUniform(const std::string& Name, const int& size);
 

@@ -19,9 +19,9 @@ public:
     void updateImage() override;
 	void bind(const int& index = 0) override;
 	void unbind(const int& index = 0) override;
-    void repeat(bool mirrored = false) override {};
-    void clampToEdge(bool border = false) override {};
-    void setFiltering(FilteringType filteringtype) override {};
+    void repeat([[maybe_unused]] bool mirrored = false) override {};
+    void clampToEdge([[maybe_unused]] bool border = false) override {};
+    void setFiltering([[maybe_unused]] FilteringType filteringtype) override {};
 
 
     //Setter
