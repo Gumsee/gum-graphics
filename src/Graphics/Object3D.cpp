@@ -10,16 +10,16 @@
 
 
 Object3D::RenderFunc Object3D::pRenderStripFunc = [](Object3D* obj) {
-    obj->pVertexArrayObject->render(obj->vInstances.size());
+    obj->pVertexArrayObject->render((unsigned int)obj->vInstances.size());
 };
 Object3D::RenderFunc Object3D::pRenderTessellatedStripFunc = [](Object3D* obj) {
-    obj->pVertexArrayObject->renderTesselated(obj->vInstances.size());
+    obj->pVertexArrayObject->renderTesselated((unsigned int)obj->vInstances.size());
 };
 Object3D::RenderFunc Object3D::pRenderIndexedFunc = [](Object3D* obj) {
-    obj->pVertexArrayObject->renderIndexed(obj->vInstances.size());
+    obj->pVertexArrayObject->renderIndexed((unsigned int)obj->vInstances.size());
 };
 Object3D::RenderFunc Object3D::pRenderTessellatedIndexedFunc = [](Object3D* obj) {
-    obj->pVertexArrayObject->renderTesselatedIndexed(obj->vInstances.size());
+    obj->pVertexArrayObject->renderTesselatedIndexed((unsigned int)obj->vInstances.size());
 };
 
 Object3D::Object3D(bool initvao)
@@ -78,7 +78,7 @@ Object3D::Object3D(const Gum::File& modelFile, const std::string& name) : Object
         pMesh = new Mesh(modelFile.getName());
         
         Scene3DLoader loader;
-        loader.iterateMeshes([this](unsigned int currentMesh, unsigned int numMeshes, Mesh* mesh, Bone* rootbone, std::vector<Bone*> bones) {
+        loader.iterateMeshes([this]([[maybe_unused]]unsigned int currentMesh, [[maybe_unused]]unsigned int numMeshes, Mesh* mesh, [[maybe_unused]]Bone* rootbone, [[maybe_unused]]std::vector<Bone*> bones) {
             pMesh->addMesh(mesh);
             Gum::_delete(mesh);
         });
@@ -215,12 +215,12 @@ Object3DInstance* Object3D::operator++() { return addInstance(); }
 
 void Object3D::applyTransformationMatrix(Object3DInstance *inst)
 {
-	for(size_t i = 0; i < vInstances.size(); i++)
-	{
+    for(size_t i = 0; i < vInstances.size(); i++)
+    {
         if(inst == vInstances[i])
         {
             //TODO
-			pTransMatricesVBO->setSingleData(inst->getMatrix(), i); //To fix
+			      pTransMatricesVBO->setSingleData(inst->getMatrix(), (unsigned int)i); //To fix
             vTransforms[i] = inst->getMatrix(); // To get rid of
         }
     }
@@ -281,7 +281,7 @@ void Object3D::saveToFile(const Gum::Filesystem::File& file)
 //Setter
 //
 void Object3D::setShaderProgram(ShaderProgram *shader)     { this->pShader = shader; }
-void Object3D::setName(const std::string& name) 	       { this->sName = name; }
+void Object3D::setName(const std::string& name) 	         { this->sName = name; }
 void Object3D::renderTessellated(bool tessellated)         { this->bRenderTessellated = tessellated; selectRenderFunc(); }
 void Object3D::onAddInstance(AddInstanceCallback callback) { this->pAddInstanceCallback = callback; }
 
@@ -290,10 +290,10 @@ void Object3D::onAddInstance(AddInstanceCallback callback) { this->pAddInstanceC
 //Getter
 //
 Mesh*               Object3D::getMesh()                              { return pMesh; }
-std::string 		Object3D::getName() 			                 { return sName; }
+std::string 		Object3D::getName() 			                           { return sName; }
 Object3DInstance* 	Object3D::getInstance(const unsigned int& index) { return vInstances[(size_t)index]; }
-ShaderProgram*		Object3D::getShaderProgram()	                 { return pShader; }
-unsigned int        Object3D::numInstances() 	                     { return vInstances.size(); }
+ShaderProgram*		Object3D::getShaderProgram()	                     { return pShader; }
+unsigned int        Object3D::numInstances() 	                       { return (unsigned int)vInstances.size(); }
 VertexArrayObject*  Object3D::getVertexArrayObject()                 { return pVertexArrayObject; }
 
 

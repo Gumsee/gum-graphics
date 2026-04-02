@@ -25,5 +25,5 @@ void Texture2DBasic::setData(const ivec2& size, const int& numchannels, const vo
 //
 // Getter
 //
-ivec2 Texture2DBasic::getSize() const   { return this->v2Size; }
-int Texture2DBasic::numChannels() const { return this->iChannels; }
+ivec2 Texture2DBasic::getSize() const            { return this->v2Size; }
+unsigned int Texture2DBasic::numChannels() const { return this->iChannels; }

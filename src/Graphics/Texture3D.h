@@ -17,9 +17,9 @@ protected:
 public:	
 	tTexture3D(std::string name = "unknown");
 	tTexture3D(const std::string& name, const ivec3& size, Texture3DGeneratorFunc generator);
-    ~tTexture3D() override;
+  ~tTexture3D() override {};
 
-    void updateImage() override;
+  void updateImage() override;
 	void generate(Texture3DGeneratorFunc function);
 	void bind(const int& index = 0) override;
 	void unbind(const int& index = 0) override;
@@ -41,9 +41,6 @@ public:
     ivec3 getSize() const;
     color getPixel(const ivec3& coord) const;
 };
-
-template class tTexture3D<unsigned char>;
-template class tTexture3D<float>;
 
 typedef tTexture3D<unsigned char> Texture3D;
 typedef tTexture3D<float> Texture3Df;

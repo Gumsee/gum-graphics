@@ -24,11 +24,6 @@ tTexture3D<T>::tTexture3D(const std::string& name, const ivec3& size, Texture3DG
     initEmpty();
     this->generate(generator);
 }
-
-template<typename T>
-tTexture3D<T>::~tTexture3D()
-{
-}
    
 template<typename T> 
 void tTexture3D<T>::initEmpty()
@@ -52,7 +47,7 @@ void tTexture3D<T>::generate(Texture3DGeneratorFunc function)
                 unsigned int pos = (v3Size.x * v3Size.y * z + v3Size.x * y + x) * this->numChannels(0);
 
                 for(unsigned int i = 0; i < this->numChannels(0); i++)
-                    this->setDataAt(pos + i, 0, col[i]);
+                    this->setDataAt(pos + i, 0, (T)col[i]);
             }
         }
     }
@@ -85,7 +80,7 @@ void tTexture3D<T>::setPixel(const ivec3& coord, const color& col)
     if(pos >= v3Size.x * v3Size.y * v3Size.z * this->numChannels(0))
         return;
     for(unsigned int i = 0; i < this->numChannels(0); i++)
-        this->setDataAt(pos + i, 0, col[i]);
+        this->setDataAt(pos + i, 0, (T)col[i]);
 }
 
 
@@ -105,3 +100,6 @@ template<typename T> color tTexture3D<T>::getPixel(const ivec3& coord) const
         retcol[i] = this->getDataAt(pos + i, 0);
     return retcol;
 }
+
+template class tTexture3D<unsigned char>;
+template class tTexture3D<float>;

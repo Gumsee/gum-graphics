@@ -94,7 +94,7 @@ public:
     }
 
     //Setter
-	void setPrimitiveType(const unsigned int& type);
+	  void setPrimitiveType(const unsigned int& type);
     void setVertexCount(const unsigned int& count);
     void onRenderCountUpdate(std::function<void()> func);
 

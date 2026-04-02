@@ -64,9 +64,9 @@ public:
     void resetViewport();
     void clear(const unsigned short& flags);
 
-    template<typename T> tTexture2D<T>* addTextureAttachment(unsigned int index = 0, std::string name = "framebufferTexture", uint16_t numChannels = 4);
-    template<typename T> tTextureCube<T>* addCubeTextureAttachment(unsigned int index = 0, std::string name = "framebufferCubeTexture", uint16_t format = Gum::Graphics::Pixelformat::RGBA, uint16_t internalFormat = Gum::Graphics::Pixelformat::RGBA);
-    template<typename T> tTextureCube<T>* addCubeTextureAttachment(unsigned int index, tTextureCube<T>* texture);
+    template<typename T> tTexture2D<T>* addTextureAttachment(uint8_t index = 0, std::string name = "framebufferTexture", uint16_t numChannels = 4);
+    template<typename T> tTextureCube<T>* addCubeTextureAttachment(uint8_t index = 0, std::string name = "framebufferCubeTexture", uint16_t format = Gum::Graphics::Pixelformat::RGBA, uint16_t internalFormat = Gum::Graphics::Pixelformat::RGBA);
+    template<typename T> tTextureCube<T>* addCubeTextureAttachment(uint8_t index, tTextureCube<T>* texture);
     Texture* addDepthTextureAttachment(std::string name = "framebufferDepthTexture");
     Texture* addDepthTextureArrayAttachment(const unsigned int& numlayers, std::string name = "framebufferDepthTextureArray");
     Texture* addDepthStencilTextureAttachment(std::string name = "framebufferDepthStencilTexture");
@@ -87,10 +87,10 @@ public:
 
 
     //Getter
-    Texture* getTextureAttachment(int index = 0);
+    Texture* getTextureAttachment(uint8_t index = 0);
     Texture* getDepthTextureAttachment();
-    int getDepthAttachmentID();
-    int numTextureAttachments();
+    unsigned int getDepthAttachmentID();
+    unsigned int numTextureAttachments();
     ivec2 getSize();
     ivec2 getOffset();
     unsigned int getID();

@@ -15,10 +15,11 @@ private:
 	std::vector<Shader*> vShaders;
 	std::unordered_map<std::string, int> Locations;
 	std::unordered_map<std::string, int> Attributes;
-    bool bIsInternal;
-
-	unsigned int iProgramID = 0;
+  
 	std::string sName;
+  bool bIsInternal;
+	unsigned int iProgramID = 0;
+
 	void compileShaders();
 	void linkShaders();
 	void createNative();

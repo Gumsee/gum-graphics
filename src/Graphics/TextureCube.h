@@ -13,7 +13,7 @@ protected:
 
 public:
 	tTextureCube(std::string name = "unknown");
-	~tTextureCube();
+	~tTextureCube() {};
 
 	void bind(const int& index = 0);
 	void unbind(const int& index = 0);
@@ -31,9 +31,6 @@ public:
     void setSize(ivec2 size, int side);
     void setSize(ivec2 size);
 };
-
-template class tTextureCube<unsigned char>;
-template class tTextureCube<float>;
 
 typedef tTextureCube<unsigned char> TextureCube;
 typedef tTextureCube<float> TextureCubef;

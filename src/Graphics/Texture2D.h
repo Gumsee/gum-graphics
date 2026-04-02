@@ -11,22 +11,30 @@ class tTexture2D : public Texture, public TextureImageData<T, 1>
 {
 protected:
     static inline unsigned int iSerializeQuality = 85;
-	ivec2 v2Size;
+	  ivec2 v2Size;
 
 public:
-	tTexture2D(std::string name = "unknown");
-	tTexture2D(const std::string& name, const ivec2& size, Texture2DGeneratorFunc generator);
-	virtual ~tTexture2D() override;
+    tTexture2D(std::string name = "unknown");
+    tTexture2D(const std::string& name, const ivec2& size, Texture2DGeneratorFunc generator);
+    virtual ~tTexture2D() override {};
 
     void updateImage() override;
-	void load(const Gum::File& filepath, bool wait);
-	void loadFromMemory(unsigned char* pixels, size_t size);
-	void generate(Texture2DGeneratorFunc function);
-	void bind(const int& index = 0) override;
-	void unbind(const int& index = 0) override;
-	static void unbindGlobal(const int& index = 0);
+    void load(const Gum::File& filepath, bool wait);
+    void loadFromMemory(unsigned char* pixels, int size);
+    void generate(Texture2DGeneratorFunc function);
+    void bind(const int& index = 0) override;
+    void unbind(const int& index = 0) override;
+    static void unbindGlobal(const int& index = 0);
 
-    float getHeightMapPixel(int x, int y);
+    float getHeightMapPixel(int x, int y)
+    {
+        color pixel = getPixel(x, y);
+        float returnHeight = pixel.r * pixel.g * pixel.b;
+        returnHeight += MAX_PIXEL_COLOR / 2.0f;
+        returnHeight /= MAX_PIXEL_COLOR / 2.0f;
+        return returnHeight;
+    }
+
     void initEmpty();
     
     void repeat(bool mirrored = false) override;
@@ -47,8 +55,8 @@ public:
     SerializationData& serialize(SerializationData& data) override;
 };
 
-template class tTexture2D<unsigned char>;
-template class tTexture2D<float>;
+//template class tTexture2D<unsigned char>;
+//template class tTexture2D<float>;
 
 typedef tTexture2D<unsigned char> Texture2D;
 typedef tTexture2D<float> Texture2Df;

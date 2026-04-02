@@ -14,11 +14,6 @@ tTextureCube<T>::tTextureCube(std::string name)
 }
 
 template<typename T>
-tTextureCube<T>::~tTextureCube()
-{
-}
-
-template<typename T>
 void tTextureCube<T>::updateImage()
 {
 	for(int i = 0; i < 6; i++)
@@ -79,3 +74,6 @@ void tTextureCube<T>::setSize(ivec2 size)
     for(int i = 0; i < 6; i++)
         setSize(size, i);
 }
+
+template class tTextureCube<unsigned char>;
+template class tTextureCube<float>;

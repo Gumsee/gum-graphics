@@ -16,16 +16,16 @@ Sprite2D::Sprite2D()
         
         pVertexArrayObject->bind();
         VertexBufferObject<float> pVertexVBO;
-		pVertexVBO.setData(afSpriteVertices, Gum::Graphics::DataState::STATIC);
+		    pVertexVBO.setData(afSpriteVertices, Gum::Graphics::DataState::STATIC);
         pVertexArrayObject->addAttribute(&pVertexVBO, 0, 2, Gum::Graphics::Datatypes::FLOAT, 0, 0);
         pVertexArrayObject->setVertexCount(pVertexVBO.getLength());
         
         pTransMatricesVBO = new VertexBufferObject<mat3>();
-		//pTransMatricesVBO->setData(vTransforms, GL_STREAM_DRAW);
-		pVertexArrayObject->addAttributeMat3(pTransMatricesVBO, 1, Gum::Graphics::Datatypes::FLOAT, 1);
+        //pTransMatricesVBO->setData(vTransforms, GL_STREAM_DRAW);
+        pVertexArrayObject->addAttributeMat3(pTransMatricesVBO, 1, Gum::Graphics::Datatypes::FLOAT, 1);
 
-		pIndividualColorsVBO = new VertexBufferObject<vec4>();
-		pVertexArrayObject->addAttribute(pIndividualColorsVBO, 5, 4, Gum::Graphics::Datatypes::FLOAT, sizeof(vec4), 0, 1);
+        pIndividualColorsVBO = new VertexBufferObject<vec4>();
+        pVertexArrayObject->addAttribute(pIndividualColorsVBO, 5, 4, Gum::Graphics::Datatypes::FLOAT, sizeof(vec4), 0, 1);
 
         pIndexBuffer = new ElementBufferObject();
         pIndexBuffer->setData(aiSpriteIndices);
@@ -72,7 +72,7 @@ void Sprite2D::applyTransformationMatrix(Sprite2DInstance *inst)
         if(inst == vInstances[i])
         {
             //TODO
-			pTransMatricesVBO->setSingleData(inst->getMatrix(), i); //To fix
+			      pTransMatricesVBO->setSingleData(inst->getMatrix(), (unsigned int)i); //To fix
             vTransforms[i] = inst->getMatrix(); // To get rid of
         }
     }
@@ -97,7 +97,7 @@ void Sprite2D::renderID()
 //Setter
 //
 void Sprite2D::setShaderProgram(ShaderProgram *shader)     { this->pShader = shader; }
-void Sprite2D::setName(const std::string& name) 	       { this->sName = name; }
+void Sprite2D::setName(const std::string& name) 	         { this->sName = name; }
 void Sprite2D::onAddInstance(AddInstanceCallback callback) { this->pAddInstanceCallback = callback; }
 void Sprite2D::setTexture(Texture2D* texture)              { this->pTexture = texture; }
 
@@ -105,11 +105,11 @@ void Sprite2D::setTexture(Texture2D* texture)              { this->pTexture = te
 //
 //Getter
 //
-std::string 		Sprite2D::getName() 			   { return sName; }
-Sprite2DInstance* 	Sprite2D::getInstance(int index)   { return vInstances[index]; }
-ShaderProgram*		Sprite2D::getShaderProgram()	   { return pShader; }
-unsigned int        Sprite2D::numInstances() 	       { return vInstances.size(); }
-VertexArrayObject*  Sprite2D::getVertexArrayObject()   { return pVertexArrayObject; }
+std::string Sprite2D::getName()                     { return sName; }
+Sprite2DInstance* Sprite2D::getInstance(int index)  { return vInstances[index]; }
+ShaderProgram* Sprite2D::getShaderProgram()	        { return pShader; }
+unsigned int Sprite2D::numInstances() 	            { return (unsigned int)vInstances.size(); }
+VertexArrayObject* Sprite2D::getVertexArrayObject() { return pVertexArrayObject; }
 
 
 void Sprite2D::cleanupSprites()

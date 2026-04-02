@@ -13,8 +13,8 @@ Material::Material()
 	sName = "";
 	fReflectivity = 0.0f;
 	fRefractivity = 0.0f;
-	fSpecularity = 0;//0.3f;
-	fRoughness = 0;//0.8f;
+	fSpecularity = 0.0f;//0.3f;
+	fRoughness = 0.0f;//0.8f;
 	iTextureMultiplier = 1;
 	bTransparency = false;
 	bFlipNormal = false;
@@ -59,7 +59,7 @@ Material::~Material()
 }
 
 
-void Material::saveToFile(const Gum::Filesystem::File& file, const unsigned int& filetype)
+void Material::saveToFile(const Gum::Filesystem::File& file, [[maybe_unused]] const unsigned int& filetype)
 {
     if(file.getType() != Gum::Filesystem::Filetype::FILE)
     {
@@ -107,7 +107,7 @@ void Material::setSpecularity(float specularity)			  { this->fSpecularity = spec
 void Material::setRoughness(float roughness)				    { this->fRoughness = roughness; }
 void Material::setReflectivity(float reflectivity)			{ this->fReflectivity = reflectivity; }
 void Material::setRefractivity(float refractivity)			{ this->fRefractivity = refractivity; }
-void Material::setTextureMultiplier(float texMultiplier){ this->iTextureMultiplier = texMultiplier; }
+void Material::setTextureMultiplier(int texMultiplier)  { this->iTextureMultiplier = texMultiplier; }
 void Material::setIsTransparency(bool isTransparent)		{ this->bTransparency = isTransparent; }
 void Material::flipNormals(bool shouldFlip)					    { this->bFlipNormal = shouldFlip; }
 
@@ -201,7 +201,7 @@ SerializationData& Material::serialize(SerializationData& data)
 {
     data & sName & fReflectivity & fRefractivity & fSpecularity & fRoughness & iTextureMultiplier & iNumUsableTextures & bTransparency & bFlipNormal;
 
-    int numtex = mTextures.size();
+    int numtex = (int)mTextures.size();
     data & numtex;
     
     if(data.isSavingData())

@@ -28,7 +28,7 @@ Shader::Shader(std::string sourcecode, unsigned int shadertype)
             uniform.name = nameparts[0];
             if(nameparts.size() > 1)
             {
-                uniform.amount = Tools::StringToInt(Tools::strExtractNumbers(nameparts[1]));
+                uniform.amount = Tools::StringToNum<short>(Tools::strExtractNumbers(nameparts[1]));
             }
         }
 

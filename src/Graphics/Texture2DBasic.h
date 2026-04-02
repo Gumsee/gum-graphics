@@ -5,7 +5,7 @@
 class Texture2DBasic
 {
 private:
-	ivec2 v2Size;
+	  ivec2 v2Size;
     unsigned int iChannels;
     unsigned int iTextureID;
 
@@ -13,10 +13,10 @@ private:
     void destroyNative();
 
 public:
-	Texture2DBasic();
-	~Texture2DBasic();
-	void bind(const int& index = 0);
-	void unbind(const int& index = 0);
+    Texture2DBasic();
+    ~Texture2DBasic();
+    void bind(const int& index = 0);
+    void unbind(const int& index = 0);
     
     void repeat(bool mirrored = false);
     void clampToEdge(bool border = false);
@@ -29,5 +29,5 @@ public:
 
     //Getter
     ivec2 getSize() const;
-    int numChannels() const;
+    unsigned int numChannels() const;
 };

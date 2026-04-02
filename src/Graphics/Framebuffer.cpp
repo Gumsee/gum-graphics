@@ -3,8 +3,9 @@
 #include "WrapperFunctions.h"
 
 Framebuffer::Framebuffer(const ivec2& size, bool iswindow, const unsigned int id)
-  : v2Size(size),
-    iID(id)
+  : iID(id),
+    v2Size(size)
+    
 {
     this->v2Offset = ivec2(0,0);
     this->iDepthBufferID = 0;
@@ -56,10 +57,10 @@ void Framebuffer::overrideID(unsigned int id)           { this->iID = id; }
 //
 // Getter
 //
-Texture* Framebuffer::getTextureAttachment(int index)   { return this->mTextureAttachments[index]; }
+Texture* Framebuffer::getTextureAttachment(uint8_t index) { return this->mTextureAttachments[index]; }
 Texture* Framebuffer::getDepthTextureAttachment()       { return this->pDepthTexture; }
-int Framebuffer::getDepthAttachmentID()                 { return this->iDepthBufferID; }
-int Framebuffer::numTextureAttachments()                { return this->mTextureAttachments.size(); }
+unsigned int Framebuffer::getDepthAttachmentID()        { return this->iDepthBufferID; }
+unsigned int Framebuffer::numTextureAttachments()       { return (unsigned int)this->mTextureAttachments.size(); }
 ivec2 Framebuffer::getSize()                            { return this->v2Size; }
 ivec2 Framebuffer::getOffset()                          { return this->v2Offset; }
 unsigned int Framebuffer::getID()                       { return this->iID; }

@@ -5,61 +5,61 @@
 
 Texture::Texture(std::string name, Type type)
 {
-    this->sName = name;
-    this->iType = type;
-    this->bLoaded = false;
-    this->bIsGrayscale = false;
-    this->bHasTransparency = true;
-    this->bIsMipmapped = false;
-	  this->iTextureID = 0;
-    this->iCurrentMipmapLevel = 0;
-    createNative();
+  this->sName = name;
+  this->iType = type;
+  this->bLoaded = false;
+  this->bIsGrayscale = false;
+  this->bHasTransparency = true;
+  this->bIsMipmapped = false;
+  this->iTextureID = 0;
+  this->iCurrentMipmapLevel = 0;
+  createNative();
 }
 
 Texture::~Texture()
 {
-    destroyNative();
+  destroyNative();
 }
 
 Texture* Texture::autoLoad(Gum::File filepath, bool waitForLoading)
 {
-    std::string name = filepath.toString();
-    if(name.empty())
-      return nullptr;
+  std::string name = filepath.toString();
+  if(name.empty())
+    return nullptr;
 
-    Gum::Output::print("Loading texture: " + filepath.toString());
-    if(Tools::mapHasKeyNotNull(mLoadedTextures, name)) 
-      Gum::Output::print("  already loaded texture: " + filepath.toString());
-      
-    if(Tools::mapHasKeyNotNull(mLoadedTextures, name)) 
-        return mLoadedTextures[name];
+  Gum::Output::debug("Loading texture: " + filepath.toString());
+  if(Tools::mapHasKeyNotNull(mLoadedTextures, name)) 
+    Gum::Output::debug("  already loaded texture: " + filepath.toString());
+    
+  if(Tools::mapHasKeyNotNull(mLoadedTextures, name)) 
+    return mLoadedTextures[name];
 
 
-		std::string extension = "";
-    if(name.length() > 3)
-      extension = Tools::toUpperCase(name.substr(name.length() - 3, 3));
-		if(extension == "HDR")
-		{
-			TextureHDR *tex = new TextureHDR(name);
-			tex->load(name, waitForLoading);
-      mLoadedTextures[filepath.toString()] = tex;
-			return tex;
-		}
-		else
-		{
-			Texture2D *tex = new Texture2D(name);
-			tex->load(name, waitForLoading);
-      mLoadedTextures[filepath.toString()] = tex;
-			return tex;
-		}
+  std::string extension = "";
+  if(name.length() > 3)
+    extension = Tools::toUpperCase(name.substr(name.length() - 3, 3));
+  if(extension == "HDR")
+  {
+    TextureHDR *tex = new TextureHDR(name);
+    tex->load(name, waitForLoading);
+    mLoadedTextures[filepath.toString()] = tex;
+    return tex;
+  }
+  else
+  {
+    Texture2D *tex = new Texture2D(name);
+    tex->load(name, waitForLoading);
+    mLoadedTextures[filepath.toString()] = tex;
+    return tex;
+  }
 }
 
 void Texture::updateBackgroundLoading()
 {
-    std::lock_guard<decltype(loadMutex)> lock(loadMutex);
-    for(Texture* tex : vToLoadTextures)
-        tex->updateImage();
-    vToLoadTextures.clear();
+  std::lock_guard<decltype(loadMutex)> lock(loadMutex);
+  for(Texture* tex : vToLoadTextures)
+    tex->updateImage();
+  vToLoadTextures.clear();
 }
 
 void Texture::cleanupAllLoadedTextures()
@@ -71,8 +71,8 @@ void Texture::cleanupAllLoadedTextures()
 
 void Texture::createMipmaps()
 {
-    this->bIsMipmapped = true;
-    updateImage();
+  this->bIsMipmapped = true;
+  updateImage();
 }
 
 
@@ -81,7 +81,7 @@ void Texture::createMipmaps()
 // Setter
 //
 void Texture::setName(const std::string& name)	                { this->sName = name; }
-void Texture::setID(const int& id) 				                { this->iTextureID = id; }
+void Texture::setID(const int& id) 				                      { this->iTextureID = id; }
 void Texture::markLoaded()                                      { this->bLoaded = true; }
 void Texture::setGrayscale(const bool& isgrayscale)             { this->bIsGrayscale = isgrayscale; }
 void Texture::setActiveMipmapLevel(const unsigned short& level) { this->iCurrentMipmapLevel = level; }
@@ -93,7 +93,7 @@ void Texture::setTransparency(const bool& hastransparency)      { this->bHasTran
 //
 unsigned int Texture::getID() const    { return this->iTextureID; }
 Texture::Type Texture::getType() const { return static_cast<Type>(this->iType); }
-bool Texture::isLoaded() const 		   { return this->bLoaded; }
+bool Texture::isLoaded() const 		     { return this->bLoaded; }
 std::string Texture::getName() const   { return this->sName; }
 bool Texture::isGrayscale() const      { return this->bIsGrayscale; }
 bool Texture::hasTransparency() const  { return this->bHasTransparency; }
@@ -101,6 +101,6 @@ bool Texture::hasTransparency() const  { return this->bHasTransparency; }
 
 SerializationData& Texture::serialize(SerializationData& data)
 {
-    data & sName;
-    return data;
+  data & sName;
+  return data;
 }

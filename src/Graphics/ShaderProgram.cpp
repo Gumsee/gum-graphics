@@ -8,21 +8,21 @@ ShaderProgram::ShaderProgram(const std::string& name, bool internal)
   : sName(name),
     bIsInternal(internal)
 {
-    createNative();
+  createNative();
 
-    if(Tools::mapHasKeyNotNull(mShaderPrograms, name))
-        Gum::Output::error("ShaderProgram: program with name " + name + " already exists!");
-    else
-        mShaderPrograms[name] = this;
+  if(Tools::mapHasKeyNotNull(mShaderPrograms, name))
+    Gum::Output::warn("ShaderProgram: program with name " + name + " already exists!");
+  else
+    mShaderPrograms[name] = this;
 }
 
 ShaderProgram::~ShaderProgram() 
 {
-    destroyNative();
-    if(Tools::mapHasKey(mShaderPrograms, sName))
-        mShaderPrograms.erase(sName);
+  destroyNative();
+  if(Tools::mapHasKey(mShaderPrograms, sName))
+    mShaderPrograms.erase(sName);
 
-    Locations.clear();
+  Locations.clear();
 	vShaders.clear();
 }
 
@@ -31,9 +31,9 @@ void ShaderProgram::compileShaders()
 {
 	for(size_t i = 0; i < vShaders.size(); i++)
 	{
-        std::string error = vShaders[i]->compile();
-        if(error != "")
-            Gum::Output::fatal("ShaderProgram: " + this->sName + ": " + vShaders[i]->getShaderTypeStr() + ": " + error);
+    std::string error = vShaders[i]->compile();
+    if(error != "")
+      Gum::Output::fatal("ShaderProgram: " + this->sName + ": " + vShaders[i]->getShaderTypeStr() + ": " + error);
 	}
 }
 
@@ -41,9 +41,7 @@ void ShaderProgram::addUniform(const std::string& Name) { Locations[Name] = getU
 void ShaderProgram::addUniform(const std::string& Name, const int& size)
 {
 	for (int i = 0; i < size; i++)
-	{
 		addUniform(Name + "[" + std::to_string(i) + "]");
-	}
 }
 void ShaderProgram::addTexture(const std::string& Name, const int& index)
 {
@@ -59,7 +57,7 @@ void ShaderProgram::removeShader(int index)   { this->vShaders.erase(vShaders.be
 
 void ShaderProgram::build(std::map<const char*, unsigned int> attributes)
 {
-    Gum::Output::debug("ShaderProgram: Creating Shader Program for " + sName);
+  Gum::Output::debug("ShaderProgram: Creating Shader Program for " + sName);
 	compileShaders();
 
 	for (auto attribute : attributes)
@@ -71,34 +69,34 @@ void ShaderProgram::build(std::map<const char*, unsigned int> attributes)
 	if(attributes.size() > 0)
 		Gum::Output::debug("");
 
-    Gum::Output::debug("ShaderProgram: Linking " + sName);
+  Gum::Output::debug("ShaderProgram: Linking " + sName);
 	linkShaders();
 
-    //Adding default uniforms
-    addUniform("canvassize");
-    addUniform("viewMatrix");
-    addUniform("projectionMatrix");
+  //Adding default uniforms
+  addUniform("canvassize");
+  addUniform("viewMatrix");
+  addUniform("projectionMatrix");
 
-    int texnum = 0;
+  int texnum = 0;
 	for(size_t i = 0; i < vShaders.size(); i++)
 	{
-        for(Uniform uniform : vShaders[i]->getUniforms())
-        {
-            if(uniform.type != Uniform::UNKNOWN)
-            {
-                if(uniform.amount > 1)
-                    addUniform(uniform.name, uniform.amount);
-                else
-                    addUniform(uniform.name);
-            }
-            if(uniform.type == Uniform::TEXTURE)
-            {
-                use();
-                loadUniform(uniform.name, texnum++);
-                unuse();
-            }
-        }
+    for(Uniform uniform : vShaders[i]->getUniforms())
+    {
+      if(uniform.type != Uniform::UNKNOWN)
+      {
+        if(uniform.amount > 1)
+            addUniform(uniform.name, uniform.amount);
+        else
+            addUniform(uniform.name);
+      }
+      if(uniform.type == Uniform::TEXTURE)
+      {
+        use();
+        loadUniform(uniform.name, texnum++);
+        unuse();
+      }
     }
+  }
 }
 
 //
@@ -117,7 +115,7 @@ Shader* ShaderProgram::getShader(int index) 						                            { 
 bool ShaderProgram::isInternal()                                                    { return this->bIsInternal; }
 ShaderProgram* ShaderProgram::getCurrentlyBoundShader() 			                      { return pCurrentlyBoundShaderProgram; }
 ShaderProgram* ShaderProgram::getShaderProgramByName(const std::string& name)       { return mShaderPrograms[name]; }
-unsigned int ShaderProgram::numShaderPrograms()                                     { return mShaderPrograms.size(); }
+unsigned int ShaderProgram::numShaderPrograms()                                     { return (unsigned int)mShaderPrograms.size(); }
 std::unordered_map<std::string, ShaderProgram*>& ShaderProgram::getShaderPrograms() { return mShaderPrograms; }
 
 

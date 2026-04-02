@@ -31,16 +31,6 @@ tTexture2D<T>::tTexture2D(const std::string& name, const ivec2& size, Texture2DG
 }
 
 template<typename T>
-float tTexture2D<T>::getHeightMapPixel(int x, int y)
-{
-    color pixel = getPixel(x, y);
-    float returnHeight = pixel.r * pixel.g * pixel.b;
-    returnHeight += MAX_PIXEL_COLOR / 2.0f;
-    returnHeight /= MAX_PIXEL_COLOR / 2.0f;
-    return returnHeight;
-}
-
-template<typename T>
 void tTexture2D<T>::load(const Gum::File& filepath, bool wait)
 {
       std::thread loadThread([filepath, this] {
@@ -69,7 +59,7 @@ void tTexture2D<T>::load(const Gum::File& filepath, bool wait)
 }
 
 template<typename T>
-void tTexture2D<T>::loadFromMemory(unsigned char* pixels, size_t size)
+void tTexture2D<T>::loadFromMemory(unsigned char* pixels, int size)
 {
     ImageData imageData = TextureLoader::loadImage(pixels, size);
     this->setNumChannels(imageData.numComps, 0);
@@ -91,7 +81,7 @@ void tTexture2D<T>::generate(std::function<color(ivec2 pixelcoord)> function)
             color col = function(ivec2(x,y));
             unsigned int pos = v2Size.x * y * this->numChannels(0) + x * this->numChannels(0);
             for(unsigned int i = 0; i < this->numChannels(0); i++)
-                this->setDataAt(pos + i, 0, col[i]);
+                this->setDataAt(pos + i, 0, (T)col[i]);
         }
     }
     updateImage();
@@ -131,7 +121,7 @@ void tTexture2D<T>::setPixel(const int& x, const int& y, const color& col)
     if(pos >= v2Size.x * v2Size.y * this->numChannels(0))
         return;
     for(unsigned int i = 0; i < this->numChannels(0); i++)
-        this->setDataAt(pos + i, 0, col[i]);
+        this->setDataAt(pos + i, 0, (T)col[i]);
 }
 
 template<typename T>
@@ -195,3 +185,6 @@ template<typename T> SerializationData& tTexture2D<T>::serialize(SerializationDa
 
     return data;
 }
+
+template class tTexture2D<unsigned char>;
+template class tTexture2D<float>;

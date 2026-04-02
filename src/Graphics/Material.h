@@ -44,11 +44,11 @@ private:
 	bool bHasTexture;
     
 public:
-	Material();
-    Material(Gum::Filesystem::File materialfile);
-	~Material();
+  Material();
+  Material(Gum::Filesystem::File materialfile);
+  ~Material();
 
-    void saveToFile(const Gum::Filesystem::File& file, const unsigned int& filetype = GUM_TEXTURE_FILETYPE_JPG);
+  void saveToFile(const Gum::Filesystem::File& file, const unsigned int& filetype = GUM_TEXTURE_FILETYPE_JPG);
 
 	bool isReflective();
 	bool isRefractive();
@@ -70,7 +70,7 @@ public:
 	void setRoughness(float roughness);
 	void setReflectivity(float reflectivity);
 	void setRefractivity(float refractivity);
-	void setTextureMultiplier(float texMultiplier);
+	void setTextureMultiplier(int texMultiplier);
 	void setIsTransparency(bool isTransparent);
 	void flipNormals(bool shouldFlip = true);
 	void setTexture(Texture *tex, unsigned int index);
@@ -89,6 +89,6 @@ public:
 	bool hasBlendMap();
 	bool hasTexture();
 
-    void onDeserialize() override;
-    SerializationData& serialize(SerializationData& data) override;
+  void onDeserialize() override;
+  SerializationData& serialize(SerializationData& data) override;
 };
