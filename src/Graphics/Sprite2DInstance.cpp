@@ -8,10 +8,11 @@ Sprite2DInstance::Sprite2DInstance(Sprite2D* sprite)
     updateMatrix();
 }
 
-void Sprite2DInstance::updateMatrix()
+void Sprite2DInstance::updateMatrix(bool callonupdate)
 {
     mTransformation = Gum::Maths::createTransformationMatrix(vPosition, qRotation, vScale);
     if(pParent != nullptr)
         pParent->applyTransformationMatrix(this);
-    onTransformUpdate();
+    if(callonupdate)
+      onTransformUpdate();
 }

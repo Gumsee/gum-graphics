@@ -3,6 +3,7 @@
 #include "Uniform.h"
 #include <System/Output.h>
 #include <System/MemoryManagement.h>
+#include <Essentials/Clock.h>
 
 ShaderProgram::ShaderProgram(const std::string& name, bool internal)
   : sName(name),
@@ -57,13 +58,14 @@ void ShaderProgram::removeShader(int index)   { this->vShaders.erase(vShaders.be
 
 void ShaderProgram::build(std::map<const char*, unsigned int> attributes)
 {
-  Gum::Output::debug("ShaderProgram: Creating Shader Program for " + sName);
+  Clock<> benchmarkClock;
+  //Gum::Output::debug("ShaderProgram: Creating Shader Program for " + sName);
 	compileShaders();
 
 	for (auto attribute : attributes)
 	{
 		addAttribute(attribute.first, attribute.second);
-		Gum::Output::debug("Adding attribute " + std::string(attribute.first) + " (" + std::to_string(attribute.second) + ")");
+		//Gum::Output::debug("Adding attribute " + std::string(attribute.first) + " (" + std::to_string(attribute.second) + ")");
 	}
 
 	if(attributes.size() > 0)
@@ -97,6 +99,8 @@ void ShaderProgram::build(std::map<const char*, unsigned int> attributes)
       }
     }
   }
+
+  Gum::Output::debug("ShaderProgram: Building " + sName + " took " + std::to_string(benchmarkClock.getPassedTimeInMicros()) + "us");
 }
 
 //

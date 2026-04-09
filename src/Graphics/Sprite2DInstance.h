@@ -12,7 +12,7 @@ public:
     Sprite2DInstance(Sprite2D* sprite);
     virtual ~Sprite2DInstance() {};
 
-    void updateMatrix() override;
+    void updateMatrix(bool callonupdate = true) override;
     virtual void onTransformUpdate() override {};
 
     //Setter

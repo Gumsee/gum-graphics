@@ -10,12 +10,14 @@ Object3DInstance::Object3DInstance(Object3D* obj)
     generateFurthestAwayPoint();
 }
 
-void Object3DInstance::updateMatrix()
+void Object3DInstance::updateMatrix(bool callonupdate)
 {
     mTransformation = Gum::Maths::createTransformationMatrix(vPosition, qRotation, vScale);
     if(pParent != nullptr)
         pParent->applyTransformationMatrix(this);
-    onTransformUpdate();
+    
+    if(callonupdate)
+      onTransformUpdate();
 }
 
 void Object3DInstance::generateBoundingBox()

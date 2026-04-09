@@ -18,6 +18,6 @@ public:
     virtual ~Object3DInstance() {};
 
     virtual void update() {};
-    void updateMatrix() override;
+    void updateMatrix(bool callonupdate = true) override;
     virtual void onTransformUpdate() override {};
 };

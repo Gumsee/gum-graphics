@@ -4,15 +4,15 @@
 #include "TextureHDR.h"
 
 Texture::Texture(std::string name, Type type)
+  : sName(name),
+    iType(type),
+    bLoaded(false),
+    bIsGrayscale(false),
+    bHasTransparency(true),
+    bIsMipmapped(false),
+    iTextureID(0),
+    iCurrentMipmapLevel(0)
 {
-  this->sName = name;
-  this->iType = type;
-  this->bLoaded = false;
-  this->bIsGrayscale = false;
-  this->bHasTransparency = true;
-  this->bIsMipmapped = false;
-  this->iTextureID = 0;
-  this->iCurrentMipmapLevel = 0;
   createNative();
 }
 

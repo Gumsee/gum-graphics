@@ -21,18 +21,18 @@ static constexpr bool isValidType()
 static_assert(isValidType(), "Invalid type for Texture!");
 
 private:
-	bool bNeedsFreeing[NUM_DATA_ARRAYS];
-    T* vPixelData[NUM_DATA_ARRAYS];
+	bool bNeedsFreeing[NUM_DATA_ARRAYS] = {false};
+  T* vPixelData[NUM_DATA_ARRAYS] = {nullptr};
     
-    const uint16_t iDatatype = 
-          std::is_same<T, unsigned char>() ? Gum::Graphics::Datatypes::UNSIGNED_CHAR 
-        : std::is_same<T, int>() ? Gum::Graphics::Datatypes::INTEGER 
-        : std::is_same<T, unsigned int>() ? Gum::Graphics::Datatypes::UNSIGNED_INTEGER 
-        : std::is_same<T, float>() ? Gum::Graphics::Datatypes::FLOAT 
-        : 0;
+  const uint16_t iDatatype = 
+        std::is_same<T, unsigned char>() ? Gum::Graphics::Datatypes::UNSIGNED_CHAR 
+      : std::is_same<T, int>() ? Gum::Graphics::Datatypes::INTEGER 
+      : std::is_same<T, unsigned int>() ? Gum::Graphics::Datatypes::UNSIGNED_INTEGER 
+      : std::is_same<T, float>() ? Gum::Graphics::Datatypes::FLOAT 
+      : 0;
 
 protected:
-    unsigned int iNumChannels[NUM_DATA_ARRAYS];
+    unsigned int iNumChannels[NUM_DATA_ARRAYS] = {4};
 
     void setDataPtr(T* data, size_t index)                { vPixelData[index] = data; }
     void setDataAt(size_t pos, size_t index, T data)      { vPixelData[index][pos] = data; }

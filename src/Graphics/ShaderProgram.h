@@ -47,6 +47,7 @@ public:
 	void loadUniform(const std::string& uniformName, const ivec3& var);
 	void loadUniform(const std::string& uniformName, const vec4& var);
 	void loadUniform(const std::string& uniformName, const mat4& var);
+	void loadUniform(const std::string& uniformName, const color& var);
 	void loadUniform(const std::string& uniformName, const float& var);
 	void loadUniform(const std::string& uniformName, const int& var);
 

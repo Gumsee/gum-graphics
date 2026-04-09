@@ -62,7 +62,7 @@ Object3D::Object3D(const Gum::File& modelFile, const std::string& name) : Object
     }
     else if(fileExtension == "gumobj")
     {
-        pMesh = new Mesh(modelFile.getName());
+        pMesh = Mesh::getMesh(modelFile.getName());
         std::vector<unsigned char> bytes;
         Gum::Codecs::unzip(modelFile, [&bytes](const char* data, const unsigned int len) {
             for(unsigned int i = 0; i < len; i++)
@@ -75,7 +75,7 @@ Object3D::Object3D(const Gum::File& modelFile, const std::string& name) : Object
     }
     else
     {
-        pMesh = new Mesh(modelFile.getName());
+        pMesh = Mesh::getMesh(modelFile.getName());
         
         Scene3DLoader loader;
         loader.iterateMeshes([this]([[maybe_unused]]unsigned int currentMesh, [[maybe_unused]]unsigned int numMeshes, Mesh* mesh, [[maybe_unused]]Bone* rootbone, [[maybe_unused]]std::vector<Bone*> bones) {
@@ -213,6 +213,28 @@ Object3DInstance* Object3D::addInstance()
 Object3DInstance* Object3D::operator++() { return addInstance(); }
 
 
+void Object3D::delInstance(const unsigned int& index)
+{
+  Gum::_delete(vInstances[index]);
+  vInstances.erase(vInstances.begin() + index);
+  vTransforms.erase(vTransforms.begin() + index);
+  vIndividualColors.erase(vIndividualColors.begin() + index);
+	pTransMatricesVBO->setData(vTransforms, Gum::Graphics::DataState::DYNAMIC);
+	pIndividualColorsVBO->setData(vIndividualColors, Gum::Graphics::DataState::STATIC);
+}
+
+void Object3D::clearInstances()
+{
+  for(Object3DInstance* instance : vInstances)
+    Gum::_delete(instance);
+  vInstances.clear();
+  vTransforms.clear();
+  vIndividualColors.clear();
+	pTransMatricesVBO->setData(vTransforms, Gum::Graphics::DataState::DYNAMIC);
+	pIndividualColorsVBO->setData(vIndividualColors, Gum::Graphics::DataState::STATIC);
+}
+
+
 void Object3D::applyTransformationMatrix(Object3DInstance *inst)
 {
     for(size_t i = 0; i < vInstances.size(); i++)
@@ -293,7 +315,7 @@ Mesh*               Object3D::getMesh()                              { return pM
 std::string 		Object3D::getName() 			                           { return sName; }
 Object3DInstance* 	Object3D::getInstance(const unsigned int& index) { return vInstances[(size_t)index]; }
 ShaderProgram*		Object3D::getShaderProgram()	                     { return pShader; }
-unsigned int        Object3D::numInstances() 	                       { return (unsigned int)vInstances.size(); }
+unsigned int        Object3D::numInstances() const                   { return (unsigned int)vInstances.size(); }
 VertexArrayObject*  Object3D::getVertexArrayObject()                 { return pVertexArrayObject; }
 
 

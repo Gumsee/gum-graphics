@@ -19,7 +19,7 @@ public:
     }
     virtual ~TransformableInstance() {};
 
-    virtual void updateMatrix() override {};
+    virtual void updateMatrix(bool = true) override {};
     virtual void onTransformUpdate() override {};
 
     //Setter

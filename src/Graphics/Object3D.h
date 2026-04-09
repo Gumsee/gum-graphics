@@ -24,10 +24,10 @@ protected:
 
 	ShaderProgram *pShader = nullptr;
 	VertexArrayObject* pVertexArrayObject = nullptr;
-    ElementBufferObject* pIndexBuffer = nullptr;
-    VertexBufferObject<mat4>* pTransMatricesVBO = nullptr;
-    VertexBufferObject<Vertex>* pVertexVBO = nullptr;
-    VertexBufferObject<vec4>* pIndividualColorsVBO = nullptr;
+  ElementBufferObject* pIndexBuffer = nullptr;
+  VertexBufferObject<mat4>* pTransMatricesVBO = nullptr;
+  VertexBufferObject<Vertex>* pVertexVBO = nullptr;
+  VertexBufferObject<vec4>* pIndividualColorsVBO = nullptr;
 
 	std::vector<Object3DInstance*> vInstances;
 	std::vector<mat4> vTransforms;
@@ -36,48 +36,50 @@ protected:
 	//General
 	bool hasbackface = true;		//Render only one side?
 	bool inverseCulling = false;	//Show insides?
-    bool bRenderTessellated = false;
+  bool bRenderTessellated = false;
 
 	std::string sName;				//Object Name
-    RenderFunc pRenderFunc;
-    AddInstanceCallback pAddInstanceCallback;
+  RenderFunc pRenderFunc;
+  AddInstanceCallback pAddInstanceCallback;
 
 	Mesh *pMesh = nullptr;
 
 
 	void load();
 	Object3DInstance* addInstance(Object3DInstance* instance);
-    void selectRenderFunc();
+  void selectRenderFunc();
 
 public:
 	Object3D(const Gum::File& modelFile, const std::string& name);
 	Object3D(Mesh *mesh, std::string name);
 	virtual ~Object3D();
 
-    void applyTransformationMatrix(Object3DInstance *inst);
-    void saveToFile(const Gum::Filesystem::File& file);
+  void applyTransformationMatrix(Object3DInstance *inst);
+  void saveToFile(const Gum::Filesystem::File& file);
 
-    virtual void prerender() override {};
+  virtual void prerender() override {};
 	virtual void render() override;
 	void renderID() override;
 	void renderMesh();
 
 	Object3DInstance* addInstance();
 	Object3DInstance* operator++();
+  void delInstance(const unsigned int& index);
+  void clearInstances();
 
-    //Setter
+  //Setter
 	void setShaderProgram(ShaderProgram *shader);
 	void setName(const std::string& name);
-    void renderTessellated(bool tessellated);
-    void onAddInstance(AddInstanceCallback callback);
+  void renderTessellated(bool tessellated);
+  void onAddInstance(AddInstanceCallback callback);
 
-    //Getter
+  //Getter
 	std::string getName();
-    Mesh* getMesh();
+  Mesh* getMesh();
 	Object3DInstance* getInstance(const unsigned int& index = 0);
 	ShaderProgram* getShaderProgram();
-	unsigned int numInstances();
-    VertexArrayObject* getVertexArrayObject();
+	unsigned int numInstances() const;
+  VertexArrayObject* getVertexArrayObject();
 
-    virtual SerializationData& serialize(SerializationData& data) override;
+  virtual SerializationData& serialize(SerializationData& data) override;
 };
