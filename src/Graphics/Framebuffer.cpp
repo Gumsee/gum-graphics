@@ -28,6 +28,9 @@ Framebuffer::Framebuffer(const ivec2& size, bool iswindow, const unsigned int id
 
 Framebuffer::~Framebuffer() 
 {
+    if(CurrentlyBoundFramebuffer == this)
+      CurrentlyBoundFramebuffer = nullptr;
+
     destroyNative();
     for(auto entry : mTextureAttachments)
         Gum::_delete(entry.second);

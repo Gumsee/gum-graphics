@@ -45,9 +45,9 @@ Shader::Shader(std::string sourcecode, unsigned int shadertype)
 
 Shader::~Shader()
 {
-    destroyNative();
-    if(Tools::mapHasKey(mShaders, iShaderID))
-        mShaders.erase(iShaderID);
+  destroyNative();
+  if(Tools::mapHasKey(mShaders, iShaderID))
+    mShaders.erase(iShaderID);
 }
 
 

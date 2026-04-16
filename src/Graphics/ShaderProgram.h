@@ -3,7 +3,7 @@
 #include <gum-maths.h>
 #include "Shader.h"
 #include <unordered_map>
-#include <vector>
+#include <set>
 
 class ShaderProgram
 {
@@ -12,12 +12,13 @@ private:
 
 	void getAllUniformLocations();
 
-	std::vector<Shader*> vShaders;
+	std::set<Shader*> vShaders;
 	std::unordered_map<std::string, int> Locations;
 	std::unordered_map<std::string, int> Attributes;
   
 	std::string sName;
   bool bIsInternal;
+  bool bHasBeenBuilt = false;
 	unsigned int iProgramID = 0;
 
 	void compileShaders();
@@ -28,9 +29,11 @@ private:
 	void addUniform(const std::string& Name, const int& size);
 
 	inline static ShaderProgram* pCurrentlyBoundShaderProgram = nullptr;
+  
+protected:
+	ShaderProgram(const std::string& name, bool internal);
 
 public:
-	ShaderProgram(const std::string& name, bool internal);
 	~ShaderProgram();
 
 	void addAttribute(const std::string& attributeName, const int& number);
@@ -69,7 +72,7 @@ public:
 	void rebuild();
 
 	void addShader(Shader* shader);
-	void removeShader(int index);
+	void removeShader(Shader* shader);
 
     template<typename T>
     static void loadUniformForAll(const std::string& uniformName, const T& value)
@@ -96,10 +99,10 @@ public:
 	std::string getName() const;
 	unsigned int getProgramID() const;
 	static ShaderProgram* getCurrentlyBoundShader();
-	static ShaderProgram* getShaderProgramByName(const std::string& name);
+	static ShaderProgram* requestShaderProgram(const std::string& name, bool internal = false);
 	static std::unordered_map<std::string, ShaderProgram*>& getShaderPrograms();
 	static unsigned int numShaderPrograms();
-	Shader* getShader(int index);
-    bool isInternal();
+	Shader* getShader(unsigned int type);
+  bool isInternal();
 };
 

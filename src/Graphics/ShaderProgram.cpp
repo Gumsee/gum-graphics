@@ -15,10 +15,16 @@ ShaderProgram::ShaderProgram(const std::string& name, bool internal)
     Gum::Output::warn("ShaderProgram: program with name " + name + " already exists!");
   else
     mShaderPrograms[name] = this;
+
+    
+  if(pCurrentlyBoundShaderProgram == nullptr)
+    pCurrentlyBoundShaderProgram = this;
 }
 
 ShaderProgram::~ShaderProgram() 
 {
+  if(pCurrentlyBoundShaderProgram == this)
+    pCurrentlyBoundShaderProgram = nullptr;
   destroyNative();
   if(Tools::mapHasKey(mShaderPrograms, sName))
     mShaderPrograms.erase(sName);
@@ -30,11 +36,11 @@ ShaderProgram::~ShaderProgram()
 //Compiles the shaders into a form that your GPU can understand
 void ShaderProgram::compileShaders() 
 {
-	for(size_t i = 0; i < vShaders.size(); i++)
+	for(Shader* shader : vShaders)
 	{
-    std::string error = vShaders[i]->compile();
+    std::string error = shader->compile();
     if(error != "")
-      Gum::Output::fatal("ShaderProgram: " + this->sName + ": " + vShaders[i]->getShaderTypeStr() + ": " + error);
+      Gum::Output::fatal("ShaderProgram: " + this->sName + ": " + shader->getShaderTypeStr() + ": " + error);
 	}
 }
 
@@ -53,11 +59,14 @@ void ShaderProgram::addTexture(const std::string& Name, const int& index)
 }
 
 
-void ShaderProgram::addShader(Shader* shader) { if(shader != nullptr) this->vShaders.push_back(shader); }
-void ShaderProgram::removeShader(int index)   { this->vShaders.erase(vShaders.begin() + index); }
+void ShaderProgram::addShader(Shader* shader) { if(shader != nullptr) this->vShaders.insert(shader); }
+void ShaderProgram::removeShader(Shader* shader)   { this->vShaders.erase(shader); }
 
 void ShaderProgram::build(std::map<const char*, unsigned int> attributes)
 {
+  if(bHasBeenBuilt)
+    return;
+
   Clock<> benchmarkClock;
   //Gum::Output::debug("ShaderProgram: Creating Shader Program for " + sName);
 	compileShaders();
@@ -80,9 +89,9 @@ void ShaderProgram::build(std::map<const char*, unsigned int> attributes)
   addUniform("projectionMatrix");
 
   int texnum = 0;
-	for(size_t i = 0; i < vShaders.size(); i++)
+	for(Shader* shader : vShaders)
 	{
-    for(Uniform uniform : vShaders[i]->getUniforms())
+    for(Uniform uniform : shader->getUniforms())
     {
       if(uniform.type != Uniform::UNKNOWN)
       {
@@ -101,6 +110,7 @@ void ShaderProgram::build(std::map<const char*, unsigned int> attributes)
   }
 
   Gum::Output::debug("ShaderProgram: Building " + sName + " took " + std::to_string(benchmarkClock.getPassedTimeInMicros()) + "us");
+  bHasBeenBuilt = true;
 }
 
 //
@@ -115,12 +125,25 @@ void ShaderProgram::setCurrentlyBoundShader(ShaderProgram* program) { pCurrently
 //
 std::string ShaderProgram::getName() const           				                        { return this->sName; }
 unsigned int ShaderProgram::getProgramID() const           			                    { return this->iProgramID; }
-Shader* ShaderProgram::getShader(int index) 						                            { return this->vShaders[index]; }
 bool ShaderProgram::isInternal()                                                    { return this->bIsInternal; }
 ShaderProgram* ShaderProgram::getCurrentlyBoundShader() 			                      { return pCurrentlyBoundShaderProgram; }
-ShaderProgram* ShaderProgram::getShaderProgramByName(const std::string& name)       { return mShaderPrograms[name]; }
 unsigned int ShaderProgram::numShaderPrograms()                                     { return (unsigned int)mShaderPrograms.size(); }
 std::unordered_map<std::string, ShaderProgram*>& ShaderProgram::getShaderPrograms() { return mShaderPrograms; }
+ShaderProgram* ShaderProgram::requestShaderProgram(const std::string& name, bool internal)
+{ 
+  if(Tools::mapHasKey(mShaderPrograms, name))
+    return mShaderPrograms[name]; 
+  
+  return new ShaderProgram(name, internal);
+}
+
+Shader* ShaderProgram::getShader(unsigned int type)
+{ 
+	for(Shader* shader : vShaders)
+    if(shader->getShaderType() == type)
+      return shader;
+  return nullptr;
+}
 
 
 void ShaderProgram::destroyAllShaders()
