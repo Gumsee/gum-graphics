@@ -255,8 +255,8 @@ void Object3D::selectRenderFunc()
     unsigned int type = pVertexArrayObject->getPrimitiveType();
     bool isStrip = type == VertexArrayObject::PrimitiveTypes::LINE_STRIP 
                 || type == VertexArrayObject::PrimitiveTypes::LINE_LOOP 
-                || type == VertexArrayObject::PrimitiveTypes::TRIANGLE_STRIP 
-                || type == VertexArrayObject::PrimitiveTypes::QUAD_STRIP;
+                || type == VertexArrayObject::PrimitiveTypes::TRIANGLE_STRIP;
+                //|| type == VertexArrayObject::PrimitiveTypes::QUAD_STRIP;
 
     if(isStrip)
     {

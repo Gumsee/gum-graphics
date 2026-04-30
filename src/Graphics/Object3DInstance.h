@@ -7,17 +7,21 @@ class Object3D;
 class Object3DInstance : public TransformableInstance<Object3D, 3U>
 {
 protected:
+  void* pUserPtr;
 	float fFurthestAwayPoint;
 	bbox3 bBoundingBox;
 
-    void generateBoundingBox();
+  void generateBoundingBox();
 	void generateFurthestAwayPoint();
 
 public:
-    Object3DInstance(Object3D* obj);
-    virtual ~Object3DInstance() {};
+  Object3DInstance(Object3D* obj);
+  virtual ~Object3DInstance() {};
 
-    virtual void update() {};
-    void updateMatrix(bool callonupdate = true) override;
-    virtual void onTransformUpdate() override {};
+  virtual void update() {};
+  void updateMatrix(bool callonupdate = true) override;
+  virtual void onTransformUpdate() override {};
+
+  void setUserPtr(void* userptr);
+  void* getUserPtr();
 };

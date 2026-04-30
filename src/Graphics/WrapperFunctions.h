@@ -5,3 +5,4 @@ extern bool gumTexImage2D(const unsigned int& target, const int& level, const in
 extern bool gumPixelStorei(const unsigned int& pname, const int& param);
 extern bool gumGenTextures(const int& n, unsigned int* textures);
 extern bool gumScissor(bbox2i bbox);
+extern std::string graphicsErrorCodeToString(const unsigned int& error);

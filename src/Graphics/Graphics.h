@@ -28,8 +28,11 @@ namespace Graphics
     extern void renderWireframe(const bool wireframe);
     extern void cullBackside(const bool cullback);
     extern void printInfo();
-    extern void init();
     extern void loadDefaults();
+
+    typedef void (*GLADapiproc)(void);
+    typedef GLADapiproc (*GLADloadfunc)(const char *name);
+    extern void init(GLADloadfunc extentionloadfunc);
 
     // Helper to check for extension string presence.  Adapted from:
     //   http://www.opengl.org/resources/features/OGLextensions/

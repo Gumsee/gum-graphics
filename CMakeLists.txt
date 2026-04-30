@@ -76,10 +76,6 @@ message(STATUS "${PROJECT_NAME}: CXXFLAGS: ${CMAKE_CXX_FLAGS}")
             find_package(GumPrimitives REQUIRED)
         endif() 
     
-        if(NOT GUMGLFW_FOUND) 
-            find_package(GumGLFW REQUIRED)
-        endif() 
-    
         if(NOT GUMDESKTOP_FOUND) 
             find_package(GumDesktop)
         endif() 

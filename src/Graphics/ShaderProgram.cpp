@@ -67,7 +67,7 @@ void ShaderProgram::build(std::map<const char*, unsigned int> attributes)
   if(bHasBeenBuilt)
     return;
 
-  Clock<> benchmarkClock;
+  Clock benchmarkClock;
   //Gum::Output::debug("ShaderProgram: Creating Shader Program for " + sName);
 	compileShaders();
 
