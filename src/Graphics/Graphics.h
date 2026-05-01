@@ -30,9 +30,7 @@ namespace Graphics
     extern void printInfo();
     extern void loadDefaults();
 
-    typedef void (*GLADapiproc)(void);
-    typedef GLADapiproc (*GLADloadfunc)(const char *name);
-    extern void init(GLADloadfunc extentionloadfunc);
+    extern void init();
 
     // Helper to check for extension string presence.  Adapted from:
     //   http://www.opengl.org/resources/features/OGLextensions/
