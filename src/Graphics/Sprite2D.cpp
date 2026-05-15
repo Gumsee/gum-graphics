@@ -22,7 +22,7 @@ Sprite2D::Sprite2D()
         
         pTransMatricesVBO = new VertexBufferObject<mat3>();
         //pTransMatricesVBO->setData(vTransforms, GL_STREAM_DRAW);
-        pVertexArrayObject->addAttributeMat3(pTransMatricesVBO, 1, Gum::Graphics::Datatypes::FLOAT, 1);
+        pVertexArrayObject->addAttributeMat(pTransMatricesVBO, 1, 3, Gum::Graphics::Datatypes::FLOAT, 1);
 
         pIndividualColorsVBO = new VertexBufferObject<vec4>();
         pVertexArrayObject->addAttribute(pIndividualColorsVBO, 5, 4, Gum::Graphics::Datatypes::FLOAT, sizeof(vec4), 0, 1);

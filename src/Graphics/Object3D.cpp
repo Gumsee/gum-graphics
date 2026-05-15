@@ -134,7 +134,7 @@ void Object3D::load()
 
 	if(pMesh != nullptr)
 	{
-        //Binding
+      //Binding
       pVertexArrayObject->bind();
       pVertexVBO = new VertexBufferObject<Vertex>();
       pVertexVBO->setData(pMesh->getVertexBuffer(), Gum::Graphics::DataState::STATIC);
@@ -149,7 +149,7 @@ void Object3D::load()
         
       pTransMatricesVBO = new VertexBufferObject<mat4>();
       //pTransMatricesVBO->setData(vTransforms, GL_STREAM_DRAW);
-      pVertexArrayObject->addAttributeMat4(pTransMatricesVBO, 3, Gum::Graphics::Datatypes::FLOAT, 1);
+      pVertexArrayObject->addAttributeMat(pTransMatricesVBO, 3, 4, Gum::Graphics::Datatypes::FLOAT, 1);
 
       pIndividualColorsVBO = new VertexBufferObject<vec4>();
       pVertexArrayObject->addAttribute(pIndividualColorsVBO, 10, 4, Gum::Graphics::Datatypes::FLOAT, sizeof(vec4), 0, 1);
@@ -176,12 +176,17 @@ void Object3D::load()
 //Rendering stuff
 void Object3D::render()
 {
-    renderMesh();
+  renderMesh();
+}
+
+void Object3D::renderForShadowmap()
+{
+  renderMesh();
 }
 
 void Object3D::renderID()
 {
-    renderMesh();
+  renderMesh();
 }
 
 void Object3D::renderMesh()

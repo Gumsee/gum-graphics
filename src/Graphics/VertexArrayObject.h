@@ -9,40 +9,50 @@
 class VertexArrayObject
 {
 public:
-    struct PrimitiveTypes
-    {
-        static const unsigned int POINTS;
-        static const unsigned int TRIANGLES;
-        static const unsigned int TRIANGLE_STRIP;
-        static const unsigned int TRIANGLE_FAN;
-        static const unsigned int LINES;
-        static const unsigned int LINE_STRIP;
-        static const unsigned int LINE_LOOP;
-        static const unsigned int LINE_ADJACENCY;
-        static const unsigned int QUADS;
-        static const unsigned int QUAD_STRIP;
-    };
+  struct PrimitiveTypes
+  {
+    static const unsigned int POINTS;
+    static const unsigned int TRIANGLES;
+    static const unsigned int TRIANGLE_STRIP;
+    static const unsigned int TRIANGLE_FAN;
+    static const unsigned int LINES;
+    static const unsigned int LINE_STRIP;
+    static const unsigned int LINE_LOOP;
+    static const unsigned int LINE_ADJACENCY;
+    static const unsigned int QUADS;
+    static const unsigned int QUAD_STRIP;
+  };
 
 private:
-    unsigned int ivaoID;
-    unsigned int iIndexBuffer;
-    unsigned int iVertexCount;
-    unsigned int iRenderCount;
-    unsigned int iPrimitiveType;
-    std::vector<unsigned int> vBufferIDs;
-	std::vector<unsigned int> vAttributes;
-    std::function<void()> pOnRenderCountFunc;
+  struct AttributeProperties
+  {
+    const unsigned int index;
+    const unsigned int vbo;
+    const unsigned int dimension;
+    const unsigned int type;
+    const unsigned int divisor;
+    const size_t stride;
+    const size_t offset;
+  };
 
-    void updateRenderCount();
-    void createNative();
-    void destroyNative();
-    void addAttributeNative(const unsigned int& index, const unsigned int& dimension, const unsigned int& type, const size_t& stride, const size_t& offset, const unsigned int& divisor);
-    void addAttributeMat4Native(unsigned int index, unsigned int type, const unsigned int& divisor);
-    void addAttributeMat3Native(unsigned int index, unsigned int type, const unsigned int& divisor);
+  std::unordered_map<void*, unsigned int> iID;
+  unsigned int iVertexCount;
+  unsigned int iRenderCount;
+  unsigned int iPrimitiveType;
+  std::vector<AttributeProperties> vAttributes;
+  unsigned int iIndexBuffer;
+  std::function<void()> pOnRenderCountFunc;
+
+  void updateRenderCount();
+  void createNative();
+  void destroyNative();
+  void addAttributeNative(AttributeProperties& properties);
 
 public:
     VertexArrayObject(const unsigned int& primitivetype);
     ~VertexArrayObject();
+
+    void reinitializeAttributesAndID();
 
     void bind();
     void unbind();
@@ -60,10 +70,17 @@ public:
     {
         bind();
         vbo->bind();
-        if(std::find(vAttributes.begin(), vAttributes.end(), index) != vAttributes.end())
-            Gum::Output::warn("VertexArrayObject: Attribute " + std::to_string(index) + " has already been added! (Not doing anything..)");
+        if(std::find_if(vAttributes.begin(), vAttributes.end(), [index](AttributeProperties prop){ return prop.index == index; }) != vAttributes.end())
+          Gum::Output::warn("VertexArrayObject: Attribute " + std::to_string(index) + " has already been added! (Not doing anything..)");
         else
-            addAttributeNative(index, dimension, type, stride, offset, divisor);
+        {
+          AttributeProperties props({
+            .index = index, .vbo = vbo->getID(), .dimension = dimension, 
+            .type = type, .divisor = divisor, .stride = stride, .offset = offset
+          });
+          addAttributeNative(props);
+          vAttributes.push_back(props);
+        }
         vbo->unbind();
         unbind();
         return index;
@@ -71,23 +88,21 @@ public:
 
 
     template<typename T>
-    unsigned int addAttributeMat4(VertexBufferObject<T>* vbo, unsigned int index, unsigned int type, const unsigned int& divisor)
+    unsigned int addAttributeMat(VertexBufferObject<T>* vbo, unsigned int index, const unsigned int& dimension, unsigned int type, const unsigned int& divisor)
     {
         bind();
         vbo->bind();
-        addAttributeMat4Native(index, type, divisor);
-        vbo->unbind();
-        unbind();
-        return index;
-    }
+        size_t rowSize = sizeof(float) * dimension;
+        for(unsigned int i = 0; i < dimension; i++)
+        {
+          AttributeProperties props({
+            .index = index + i, .vbo = vbo->getID(), .dimension = dimension, 
+            .type = type, .divisor = divisor, .stride = dimension * rowSize, .offset = i * rowSize
+          });
+          addAttributeNative(props);
+          vAttributes.push_back(props);
+        }
 
-
-    template<typename T>
-    unsigned int addAttributeMat3(VertexBufferObject<T>* vbo, unsigned int index, unsigned int type, const unsigned int& divisor)
-    {
-        bind();
-        vbo->bind();
-        addAttributeMat3Native(index, type, divisor);
         vbo->unbind();
         unbind();
         return index;
@@ -101,6 +116,6 @@ public:
     //Getter
     unsigned int numVertices() const;
     unsigned int getRenderCount() const;
-    unsigned int getID() const;
+    unsigned int getID(void* context) const;
     unsigned int getPrimitiveType() const;
 };

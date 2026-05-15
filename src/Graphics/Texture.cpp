@@ -27,12 +27,13 @@ Texture* Texture::autoLoad(Gum::File filepath, bool waitForLoading)
   if(name.empty())
     return nullptr;
 
-  Gum::Output::debug("Loading texture: " + filepath.toString());
   if(Tools::mapHasKeyNotNull(mLoadedTextures, name)) 
-    Gum::Output::debug("  already loaded texture: " + filepath.toString());
-    
-  if(Tools::mapHasKeyNotNull(mLoadedTextures, name)) 
+  {
+    Gum::Output::debug("Already loaded texture: " + filepath.toString());
     return mLoadedTextures[name];
+  }
+  
+  Gum::Output::debug("Loading texture: " + filepath.toString());
 
 
   std::string extension = "";

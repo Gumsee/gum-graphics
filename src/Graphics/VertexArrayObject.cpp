@@ -1,18 +1,20 @@
 #include "VertexArrayObject.h"
+#include <Desktop/GraphicsContext.h>
+#include <Essentials/Tools.h>
 
 VertexArrayObject::VertexArrayObject(const unsigned int& primitivetype)
 {
-    this->ivaoID = 0;
-    this->iIndexBuffer = 0;
-    this->iVertexCount = 0;
-    this->iPrimitiveType = primitivetype;
+  this->iID[GraphicsContext::CurrentlyBoundContext] = 0;
+  this->iIndexBuffer = 0;
+  this->iVertexCount = 0;
+  this->iPrimitiveType = primitivetype;
 
-    createNative();
+  createNative();
 }
 
 VertexArrayObject::~VertexArrayObject() 
 {
-    destroyNative();
+  destroyNative();
 	vAttributes.clear();
 }
 
@@ -39,6 +41,22 @@ void VertexArrayObject::updateRenderCount()
         pOnRenderCountFunc();
 }
 
+
+void VertexArrayObject::reinitializeAttributesAndID()
+{
+  //if(!Tools::mapHasKey(iID, (void*)GraphicsContext::CurrentlyBoundContext) || )
+  createNative();
+  
+  for(AttributeProperties& prop : vAttributes)
+  {
+    bind();
+    Gum::Graphics::VertexBufferObject::bind(prop.vbo);
+    addAttributeNative(prop);
+    Gum::Graphics::VertexBufferObject::unbind();
+    unbind();
+  }
+}
+
 //
 // Setter
 //
@@ -49,7 +67,7 @@ void VertexArrayObject::onRenderCountUpdate(std::function<void()> func) { this->
 //
 // Getter
 //
-unsigned int VertexArrayObject::numVertices() const      { return this->iVertexCount; }
-unsigned int VertexArrayObject::getID() const            { return this->ivaoID; }
-unsigned int VertexArrayObject::getRenderCount() const   { return this->iRenderCount; }
-unsigned int VertexArrayObject::getPrimitiveType() const { return this->iPrimitiveType; }
+unsigned int VertexArrayObject::numVertices() const        { return this->iVertexCount; }
+unsigned int VertexArrayObject::getID(void* context) const { return this->iID.at(context); }
+unsigned int VertexArrayObject::getRenderCount() const     { return this->iRenderCount; }
+unsigned int VertexArrayObject::getPrimitiveType() const   { return this->iPrimitiveType; }

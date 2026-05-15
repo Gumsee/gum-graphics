@@ -59,6 +59,7 @@ public:
 
   virtual void prerender() override {};
 	virtual void render() override;
+	virtual void renderForShadowmap() override;
 	void renderID() override;
 	void renderMesh();
 

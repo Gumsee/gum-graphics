@@ -67,8 +67,8 @@ public:
     template<typename T> tTexture2D<T>* addTextureAttachment(uint8_t index = 0, std::string name = "framebufferTexture", uint16_t numChannels = 4);
     template<typename T> tTextureCube<T>* addCubeTextureAttachment(uint8_t index = 0, std::string name = "framebufferCubeTexture", uint16_t format = Gum::Graphics::Pixelformat::RGBA, uint16_t internalFormat = Gum::Graphics::Pixelformat::RGBA);
     template<typename T> tTextureCube<T>* addCubeTextureAttachment(uint8_t index, tTextureCube<T>* texture);
-    Texture* addDepthTextureAttachment(std::string name = "framebufferDepthTexture");
-    Texture* addDepthTextureArrayAttachment(const unsigned int& numlayers, std::string name = "framebufferDepthTextureArray");
+    TextureDepth2D* addDepthTextureAttachment(std::string name = "framebufferDepthTexture");
+    TextureDepth3D* addDepthTextureArrayAttachment(const unsigned int& numlayers, std::string name = "framebufferDepthTextureArray");
     Texture* addDepthStencilTextureAttachment(std::string name = "framebufferDepthStencilTexture");
     void addDepthAttachment();
     

@@ -4,10 +4,22 @@
 #include <Essentials/Tools.h>
 #include <System/MemoryManagement.h>
 
-Shader::Shader(std::string sourcecode, unsigned int shadertype)
+static inline std::string typeToString(const unsigned int& type)
+{
+  if     (type == Shader::TYPES::VERTEX_SHADER)                  return "Vertex";
+  else if(type == Shader::TYPES::FRAGMENT_SHADER)                return "Fragment";
+  else if(type == Shader::TYPES::TESSELLATION_CONTROL_SHADER)    return "Tesselation_Control";
+  else if(type == Shader::TYPES::TESSELLATION_EVALUATION_SHADER) return "Tesselation_Evaluation";
+  else if(type == Shader::TYPES::GEOMETRY_SHADER)                return "Geometry";
+
+  return "";
+}
+
+Shader::Shader(std::string name, std::string sourcecode, unsigned int shadertype)
 {
     this->sSource = sourcecode;
     this->iType = shadertype;
+    this->sName = name;
 
     for(std::string uniformentry : Tools::grep("uniform", sourcecode, ';'))
     {
@@ -27,9 +39,7 @@ Shader::Shader(std::string sourcecode, unsigned int shadertype)
             std::vector<std::string> nameparts = Tools::splitStr(uniform.name, '[');
             uniform.name = nameparts[0];
             if(nameparts.size() > 1)
-            {
-                uniform.amount = Tools::StringToNum<short>(Tools::strExtractNumbers(nameparts[1]));
-            }
+              uniform.amount = Tools::StringToNum<short>(Tools::strExtractNumbers(nameparts[1]));
         }
 
         vUniforms.push_back(uniform);
@@ -37,17 +47,17 @@ Shader::Shader(std::string sourcecode, unsigned int shadertype)
 
     createNative();
     
-    if(Tools::mapHasKeyNotNull(mShaders, iShaderID))
+    if(Tools::mapHasKeyNotNull(mShaders, sName))
         Gum::Output::error("Shader: shader with id " + std::to_string(iShaderID) + " already exists!");
     else
-        mShaders[iShaderID] = this;
+        mShaders[sName] = this;
 }
 
 Shader::~Shader()
 {
   destroyNative();
-  if(Tools::mapHasKey(mShaders, iShaderID))
-    mShaders.erase(iShaderID);
+  if(Tools::mapHasKey(mShaders, sName))
+    mShaders.erase(sName);
 }
 
 
@@ -68,6 +78,14 @@ std::string Shader::getShaderTypeStr()
 
     return "Unknown Shader";
 }
+Shader* Shader::requestShader(const std::string& name, std::string sourcecode, unsigned int shadertype)
+{ 
+  std::string shadername = name + typeToString(shadertype);
+  if(Tools::mapHasKey(mShaders, shadername))
+    return mShaders[shadername];
+  
+  return new Shader(shadername, sourcecode, shadertype);
+}
 
 
 //
@@ -77,6 +95,6 @@ void Shader::setSourceCode(std::string code) { this->sSource = code; }
 
 void Shader::destroyAllShaders()
 {
-    while(mShaders.size() > 0)
-        Gum::_delete(mShaders.begin()->second);
+  while(mShaders.size() > 0)
+    Gum::_delete(mShaders.begin()->second);
 }

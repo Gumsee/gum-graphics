@@ -11,5 +11,6 @@ public:
     virtual void onProjectionUpdate() {};
     virtual void prerender() {};
     virtual void render() {};
+	  virtual void renderForShadowmap() {};
     virtual void renderID() {};
 };
