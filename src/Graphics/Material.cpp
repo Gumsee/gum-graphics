@@ -8,54 +8,53 @@
 #include <Codecs/Zip.h>
 
 
-Material::Material()
+Material::Material(std::string name)
+  : sName(name),
+    fReflectivity(0.0f),
+    fRefractivity(0.0f),
+    fSpecularity(0.0f),
+    fRoughness(0.0f),
+    iTextureMultiplier(1),
+    bTransparency(false),
+    bFlipNormal(false),
+    vColor(rgba(100, 100, 100, 255)),
+    bHasNormalMap(false),
+    bHasSpecularMap(false),
+    bHasReflectionMap(false),
+    bHasRefractionMap(false),
+    bHasRoughnessMap(false),
+    bHasDisplacementMap(false),
+    bHasAmbientOcclusionMap(false),
+    bHasBlendMap(false),
+    bHasTexture(false)
 {
-	sName = "";
-	fReflectivity = 0.0f;
-	fRefractivity = 0.0f;
-	fSpecularity = 0.0f;//0.3f;
-	fRoughness = 0.0f;//0.8f;
-	iTextureMultiplier = 1;
-	bTransparency = false;
-	bFlipNormal = false;
-	vColor = rgba(100, 100, 100, 255);
-
-	iNumUsableTextures = 14;
-
-	bHasNormalMap = false;
-	bHasSpecularMap = false;
-	bHasReflectionMap = false;
-	bHasRefractionMap = false;
-	bHasRoughnessMap = false;
-	bHasDisplacementMap = false;
-	bHasAmbientOcclusionMap = false;
-	bHasBlendMap = false;
-	bHasTexture = false;
+  mMaterials[sName] = this;
 }
 
 
-Material::Material(Gum::Filesystem::File materialfile)
-    : Material()
+Material::Material(std::string name, Gum::Filesystem::File materialfile)
+  : Material(name)
 {
-    if(!Gum::Filesystem::fileExists(materialfile))
-    {
-        Gum::Output::error("Material: cannot read file: " + materialfile.toString() + " is not a file!");
-        return;
-    }
+  if(!Gum::Filesystem::fileExists(materialfile))
+  {
+    Gum::Output::error("Material: cannot read file: " + materialfile.toString() + " is not a file!");
+    return;
+  }
 
-    std::vector<unsigned char> bytes;
-    Gum::Codecs::unzip(materialfile, [&bytes](const char* data, const unsigned int len) {
-        for(unsigned int i = 0; i < len; i++)
-            bytes.push_back(data[i]);
-    });
+  std::vector<unsigned char> bytes;
+  Gum::Codecs::unzip(materialfile, [&bytes](const char* data, const unsigned int len) {
+    for(unsigned int i = 0; i < len; i++)
+      bytes.push_back(data[i]);
+  });
 
-    SerializationData ndata(bytes.data(), bytes.size());
-    ndata >> *this;
+  SerializationData ndata(bytes.data(), bytes.size());
+  ndata >> *this;
 }
 
 Material::~Material()
 {
-
+  if(Tools::mapHasKey(mMaterials, sName))
+    mMaterials.erase(sName);
 }
 
 
@@ -95,13 +94,12 @@ int Material::getTextureMultiplier()						  { return this->iTextureMultiplier; }
 std::string Material::getName() 							    { return this->sName; }
 color Material::getColor()								        { return this->vColor; }
 Texture* Material::getTexture(unsigned int index) { return this->mTextures[index]; }
-int Material::numTextures() 								      { return this->iNumUsableTextures; }
+unsigned int Material::numTextures()              { return (unsigned int)this->mTextures.size(); }
 
 
 //
 //Setter
 //
-void Material::setName(std::string name) 					      { this->sName = name; }
 void Material::setColor(color col)					            { this->vColor = col; }
 void Material::setSpecularity(float specularity)			  { this->fSpecularity = specularity; }
 void Material::setRoughness(float roughness)				    { this->fRoughness = roughness; }
@@ -192,6 +190,37 @@ bool Material::hasAmbientOcclusionMap() { return this->bHasAmbientOcclusionMap; 
 bool Material::hasBlendMap() 			      { return this->bHasBlendMap; }
 bool Material::hasTexture() 			      { return this->bHasTexture; }
 
+
+Material* Material::getDefaultMaterial()
+{
+  if(pDefaultMaterial == nullptr)
+    pDefaultMaterial = requestMaterial("INTERNAL_default");
+
+  return pDefaultMaterial;
+}
+
+Material* Material::requestMaterial(const std::string& name)
+{
+  if(Tools::mapHasKey(mMaterials, name))
+    return mMaterials[name];
+  
+  return new Material(name);
+}
+
+Material* Material::requestMaterial(const std::string& name, Gum::Filesystem::File materialfile)
+{
+  if(Tools::mapHasKey(mMaterials, name))
+    return mMaterials[name];
+  
+  return new Material(name, materialfile);
+}
+
+void Material::destroyAllMaterials()
+{
+  while(mMaterials.size() > 0)
+  Gum::_delete(mMaterials.begin()->second);
+}
+
 void Material::onDeserialize()
 {
 
@@ -199,7 +228,7 @@ void Material::onDeserialize()
 
 SerializationData& Material::serialize(SerializationData& data)
 {
-    data & sName & fReflectivity & fRefractivity & fSpecularity & fRoughness & iTextureMultiplier & iNumUsableTextures & bTransparency & bFlipNormal;
+    data & sName & fReflectivity & fRefractivity & fSpecularity & fRoughness & iTextureMultiplier & bTransparency & bFlipNormal;
 
     int numtex = (int)mTextures.size();
     data & numtex;

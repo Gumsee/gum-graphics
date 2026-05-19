@@ -32,6 +32,8 @@ namespace Graphics
 
     extern void init();
 
+    extern void destroyAllAssets();
+
     // Helper to check for extension string presence.  Adapted from:
     //   http://www.opengl.org/resources/features/OGLextensions/
     extern bool isExtensionSupported(const char *extension);

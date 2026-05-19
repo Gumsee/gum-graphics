@@ -19,34 +19,38 @@
 class Material : public Serialization
 {
 private:
+  static inline std::unordered_map<std::string, Material*> mMaterials;
+  static inline Material* pDefaultMaterial = nullptr;
+
 	std::string sName;
 
-	float fReflectivity;
-	float fRefractivity;
-	float fSpecularity;
-	float fRoughness;
-	int iTextureMultiplier;
-	int iNumUsableTextures;
-	bool bTransparency;
-	bool bFlipNormal;
+	float fReflectivity = 0.0f;
+	float fRefractivity = 0.0f;
+	float fSpecularity = 0.0f;
+	float fRoughness = 0.0f;
+	int iTextureMultiplier = 1;
+	bool bTransparency = false;
+	bool bFlipNormal = false;
 	color vColor;
 
 	//Texture related stuff
 	std::unordered_map<unsigned int, Texture*> mTextures;	
-	bool bHasNormalMap;
-	bool bHasSpecularMap;
-	bool bHasReflectionMap;
-	bool bHasRefractionMap;
-	bool bHasRoughnessMap;
-	bool bHasDisplacementMap;
-	bool bHasAmbientOcclusionMap;
-	bool bHasBlendMap;
-	bool bHasTexture;
+	bool bHasNormalMap = false;
+	bool bHasSpecularMap = false;
+	bool bHasReflectionMap = false;
+	bool bHasRefractionMap = false;
+	bool bHasRoughnessMap = false;
+	bool bHasDisplacementMap = false;
+	bool bHasAmbientOcclusionMap = false;
+	bool bHasBlendMap = false;
+	bool bHasTexture = false;
+
+protected:
+  Material(std::string name);
+  Material(std::string name, Gum::Filesystem::File materialfile);
     
 public:
-  Material();
-  Material(Gum::Filesystem::File materialfile);
-  ~Material();
+  virtual ~Material();
 
   void saveToFile(const Gum::Filesystem::File& file, const unsigned int& filetype = GUM_TEXTURE_FILETYPE_JPG);
 
@@ -62,9 +66,8 @@ public:
 	std::string getName();
 	color getColor();
 	Texture* getTexture(unsigned int index);
-	int numTextures();
+	unsigned int numTextures();
 
-	void setName(std::string name);
 	void setColor(color col);
 	void setSpecularity(float specularity);
 	void setRoughness(float roughness);
@@ -88,6 +91,12 @@ public:
 	bool hasAmbientOcclusionMap();
 	bool hasBlendMap();
 	bool hasTexture();
+
+  static Material* getDefaultMaterial();
+
+	static Material* requestMaterial(const std::string& name);
+	static Material* requestMaterial(const std::string& name, Gum::Filesystem::File materialfile);
+  static void destroyAllMaterials();
 
   void onDeserialize() override;
   SerializationData& serialize(SerializationData& data) override;
